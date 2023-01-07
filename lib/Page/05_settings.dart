@@ -1,5 +1,8 @@
-// ignore_for_file: non_constant_identifier_names, file_names
+// ignore_for_file: non_constant_identifier_names, file_names, avoid_print
 
+import 'package:cherp_app/utils/progress_dialog.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'src/sources.dart';
@@ -16,6 +19,40 @@ class MySettings extends StatefulWidget {
 }
 
 class _MySettingsState extends State<MySettings> {
+  TextEditingController userNameController = TextEditingController();
+  TextEditingController fullNameController = TextEditingController();
+
+  TextEditingController profileBioController = TextEditingController();
+  User? user = FirebaseAuth.instance.currentUser;
+  dynamic userName;
+  dynamic userId;
+
+  Future<void> getUserDetails() async {
+    if (user != null) {
+      //  await FirebaseFirestore.instance.collection("users").get();
+      final snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .where(
+            "userId",
+            isEqualTo: user!.uid,
+          )
+          .get();
+      userName = snapshot.docs.first['userName'];
+      userId = snapshot.docs.first['userId'];
+      setState(() {
+        print(userId);
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    // ignore: todo
+    // TODO: implement initState
+    super.initState();
+    getUserDetails();
+  }
+
   @override
   Widget build(BuildContext context) {
     final my_spacing = SizedBox(
@@ -33,11 +70,11 @@ class _MySettingsState extends State<MySettings> {
         children: [
           const MyAvatar(),
           SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-          text_field(context, "Username"),
+          text_field(context, "Username", userNameController),
           my_spacing,
-          text_field(context, "Full Name"),
+          text_field(context, "Full Name", fullNameController),
           my_spacing,
-          text_field(context, "Profile Bio"),
+          text_field(context, "Profile Bio", profileBioController),
           my_spacing,
           Container(
             alignment: Alignment.center,
@@ -53,11 +90,33 @@ class _MySettingsState extends State<MySettings> {
               vertical: MediaQuery.of(context).size.height * 0.02,
               horizontal: MediaQuery.of(context).size.width * 0.07,
             ),
-            child: Text(
-              "Save",
-              style: sources.font_style(
-                color: Colors.black,
-                fontSize: 18,
+            child: TextButton(
+              onPressed: () async {
+                showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return ProgressDialog(
+                        message: "Please Wait..",
+                      );
+                    });
+                await FirebaseFirestore.instance
+                    .collection("profile")
+                    .doc(userId)
+                    .set({
+                  'userName': userNameController.text.toString(),
+                  'userImg': "",
+                  'userProfileBio': profileBioController.text.toString(),
+                  'fullName': fullNameController.text.toString(),
+                  "userId": userId,
+                });
+              },
+              child: Text(
+                "Save",
+                style: sources.font_style(
+                  color: Colors.black,
+                  fontSize: 18,
+                ),
               ),
             ),
           ),

@@ -1,4 +1,4 @@
-// ignore_for_file: unused_import, camel_case_types, prefer_const_constructors, non_constant_identifier_names, sized_box_for_whitespace, prefer_const_literals_to_create_immutables, avoid_unnecessary_containers, unused_element, unused_local_variable, avoid_print
+// ignore_for_file: unused_import, camel_case_types, prefer_const_constructors, non_constant_identifier_names, sized_box_for_whitespace, prefer_const_literals_to_create_immutables, avoid_unnecessary_containers, unused_element, unused_local_variable, avoid_print, prefer_is_empty
 
 import 'dart:math';
 
@@ -226,24 +226,33 @@ class _OTP_verificationState extends State<OTP_verification> {
                         verificationId: Get.arguments["id"],
                         smsCode: code.toString(),
                       );
-
                       User? userCredential =
                           (await auth.signInWithCredential(credential)).user;
-                      await firebaseFirestore
+                      final QuerySnapshot result = await FirebaseFirestore
+                          .instance
                           .collection("users")
-                          .doc(userCredential!.uid)
-                          .set({
-                        'createdAt': DateTime.now(),
-                        'userName': "",
-                        'email': "",
-                        'phoneNumber': phone,
-                        'userImg': "",
-                        "userId": userCredential.uid,
-                      }).then(
-                        (value) => Get.offAll(
-                          () => MySettings(),
-                        ),
-                      );
+                          .where('userId', isEqualTo: userCredential?.uid)
+                          .get();
+                      List<DocumentSnapshot> document = result.docs;
+                      if (document.length > 0) {
+                        Get.offAll(() => MySettings());
+                      } else {
+                        await firebaseFirestore
+                            .collection("users")
+                            .doc(userCredential!.uid)
+                            .set({
+                          'createdAt': DateTime.now(),
+                          'userName': "",
+                          'email': "",
+                          'phoneNumber': phone,
+                          'userImg': "",
+                          "userId": userCredential.uid,
+                        }).then(
+                          (value) => Get.offAll(
+                            () => MySettings(),
+                          ),
+                        );
+                      }
                     } catch (e) {
                       e.printError();
                     }

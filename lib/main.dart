@@ -1,4 +1,6 @@
-// ignore_for_file: prefer_const_constructors, non_constant_identifier_names, must_be_immutable
+// ignore_for_file: prefer_const_constructors, non_constant_identifier_names, must_be_immutable, unused_import, await_only_futures, prefer_const_constructors_in_immutables
+
+import 'dart:async';
 
 import 'package:cherp_app/firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,21 +23,53 @@ void main() async {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   MyApp({super.key});
 
-  User? user = FirebaseAuth.instance.currentUser;
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  User? user;
+
+  Future<void> auth() async {
+    await FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null) {
+        Get.to(() => MyHomePage());
+      } else {
+        Get.to(() => Sign_in());
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    // ignore: todo
+    // TODO: implement initState
+    super.initState();
+    // user = FirebaseAuth.instance.currentUser;
+    // Timer(
+    //   Duration(seconds: 2),
+    //   (() {
+    //     auth();
+    //   }),
+    // );
+    auth();
+  }
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Twittery",
-      initialRoute: (user != null ? "home" : "signin"),
-      routes: {
-        "signin": (context) => Sign_in(),
-        "verification": (context) => OTP_verification(),
-        "home": (context) => TheMain(),
-      },
+      home: Sign_in(),
+      //initialRoute: 'signin',
+      // routes: {
+      //   "signin": (context) => Sign_in(),
+      //   "verification": (context) => OTP_verification(),
+      //   "home": (context) => TheMain(),
+      // },
     );
   }
 }
