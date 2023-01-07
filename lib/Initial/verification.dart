@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:cherp_app/Initial/Signin.dart';
 import 'package:cherp_app/Page/01_home.dart';
 import 'package:cherp_app/Page/05_settings.dart';
+import 'package:cherp_app/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -235,7 +236,7 @@ class _OTP_verificationState extends State<OTP_verification> {
                           .get();
                       List<DocumentSnapshot> document = result.docs;
                       if (document.length > 0) {
-                        Get.offAll(() => MySettings());
+                        Get.offAll(() => TheMain());
                       } else {
                         await firebaseFirestore
                             .collection("users")
@@ -249,7 +250,7 @@ class _OTP_verificationState extends State<OTP_verification> {
                           "userId": userCredential.uid,
                         }).then(
                           (value) => Get.offAll(
-                            () => MySettings(),
+                            () => TheMain(),
                           ),
                         );
                       }

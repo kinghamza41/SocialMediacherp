@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:cherp_app/contacts.dart';
 import 'package:cherp_app/firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -35,11 +36,11 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> auth() async {
     await FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      if (user == null) {
-        Get.to(() => MyHomePage());
-      } else {
-        Get.to(() => Sign_in());
-      }
+      // if (user == null) {
+      //   Get.to(() => MyHomePage());
+      // } else {
+      //   Get.to(() => Sign_in());
+      // }
     });
   }
 
@@ -48,14 +49,14 @@ class _MyAppState extends State<MyApp> {
     // ignore: todo
     // TODO: implement initState
     super.initState();
-    // user = FirebaseAuth.instance.currentUser;
+    user = FirebaseAuth.instance.currentUser;
     // Timer(
     //   Duration(seconds: 2),
     //   (() {
     //     auth();
     //   }),
     // );
-    auth();
+    // auth();
   }
 
   @override
@@ -63,12 +64,12 @@ class _MyAppState extends State<MyApp> {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Twittery",
-      home: Sign_in(),
+      home: TheMain(),
       //initialRoute: 'signin',
       // routes: {
       //   "signin": (context) => Sign_in(),
       //   "verification": (context) => OTP_verification(),
-      //   "home": (context) => TheMain(),
+      // "home": (context) => TheMain(),
       // },
     );
   }

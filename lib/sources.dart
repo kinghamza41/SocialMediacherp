@@ -1,7 +1,13 @@
-// ignore_for_file: camel_case_types, constant_identifier_names
+// ignore_for_file: camel_case_types, constant_identifier_names, must_be_immutable, prefer_const_constructors, avoid_unnecessary_containers, avoid_print
 
+import 'package:cherp_app/comments.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:numeral/numeral.dart';
 
 class sources {
   static const icon_main = "assets/Icon/main_transparent.svg";
@@ -33,8 +39,31 @@ class DarkOne extends StatelessWidget {
       );
 }
 
-class TheCard extends StatelessWidget {
-  const TheCard({Key? key}) : super(key: key);
+class TheCard extends StatefulWidget {
+  String? senderUserName;
+  int cherpLikes;
+  String? documentId;
+  List? cherpLikeUserList;
+  TheCard(this.senderUserName, this.cherpLikes, this.documentId,
+      this.cherpLikeUserList,
+      {Key? key})
+      : super(key: key);
+
+  @override
+  State<TheCard> createState() => _TheCardState();
+}
+
+class _TheCardState extends State<TheCard> {
+  User? user;
+  bool? isLiked = false;
+  @override
+  void initState() {
+    // ignore: todo
+    // TODO: implement initState
+    super.initState();
+    // print(senderUserName);
+    user = FirebaseAuth.instance.currentUser;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +93,7 @@ class TheCard extends StatelessWidget {
                 ),
               ),
               Text(
+                // widget.senderUserName.toString(),
                 name,
                 style: sources.font_style(
                   color: Colors.white,
@@ -91,13 +121,17 @@ class TheCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              getAvatar(path: sources.avatar_01, name: "1st Name"),
+              getAvatar(
+                  path: sources.avatar_01,
+                  name: widget.senderUserName.toString()),
               const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Icon(Icons.arrow_circle_right_rounded,
                     color: Colors.yellow),
               ), // Arrow
-              getAvatar(path: sources.avatar_02, name: "2nd Name"),
+              getAvatar(
+                  path: sources.avatar_02,
+                  name: widget.senderUserName.toString()),
             ],
           ), // Avatars
           Text(
@@ -124,33 +158,80 @@ class TheCard extends StatelessWidget {
             ),
           ), // Image
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.favorite_border, color: Colors.white),
-                  Text(
-                    "  1.2K",
-                    style: sources.font_style(
-                      color: Colors.white,
-                      fontSize: 15,
-                    ),
+              // mainAxisAlignment: MainAxisAlignment.spaceAround,
+              GestureDetector(
+                onTap: () async {
+                  print(widget.cherpLikes);
+                  if (widget.cherpLikeUserList!.contains(user!.uid)) {
+                    await FirebaseFirestore.instance
+                        .collection("your_cherps")
+                        .doc(widget.documentId)
+                        .update({
+                      'cherpLikes': widget.cherpLikes - 1,
+                      'cherpLikeUserList': FieldValue.arrayRemove([user?.uid]),
+                    });
+                  } else {
+                    await FirebaseFirestore.instance
+                        .collection("your_cherps")
+                        .doc(widget.documentId)
+                        .update({
+                      'cherpLikes': widget.cherpLikes + 1,
+                      'cherpLikeUserList': [user!.uid],
+                    });
+                  }
+                },
+                child: Container(
+                  // color: Colors.amber,
+                  child: Row(
+                    children: [
+                      widget.cherpLikeUserList!.contains(user!.uid)
+                          ? Icon(Icons.favorite, color: Colors.red)
+                          : Icon(Icons.favorite_border, color: Colors.white),
+                      const SizedBox(width: 5),
+                      Text(
+                        Numeral(widget.cherpLikes).format().toString(),
+                        style: sources.font_style(
+                          color: Colors.white,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 10),
-                  const Icon(Icons.bookmark_border_outlined,
-                      color: Colors.white),
-                  Text(
-                    "  568",
-                    style: sources.font_style(
-                      color: Colors.white,
-                      fontSize: 15,
-                    ),
+                ),
+              ),
+
+              const SizedBox(width: 30),
+              GestureDetector(
+                onTap: () {
+                  Get.to(() => MyComments(), arguments: {
+                    'postDocumentId': widget.documentId.toString(),
+                  });
+                },
+                child: Container(
+                  // color: Colors.blue,
+                  child: Row(
+                    children: [
+                      Icon(Icons.comment, color: Colors.white),
+                      const SizedBox(width: 5),
+                      Text(
+                        Numeral(1000).format(),
+                        style: sources.font_style(
+                          color: Colors.white,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 10),
-                  const Icon(Icons.reply_rounded, color: Colors.white),
-                ],
-              ), // Icons
-              const Icon(Icons.share, color: Colors.white),
+                ),
+              ),
+
+              const SizedBox(width: 10),
+              // const Icon(Icons.reply_rounded, color: Colors.white),
+
+              // Icons
+              // const Icon(Icons.share, color: Colors.white),
             ],
           ), // Icons
         ],

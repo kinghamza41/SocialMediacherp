@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names, file_names, avoid_print
+// ignore_for_file: non_constant_identifier_names, file_names, avoid_print, use_build_context_synchronously
 
 import 'package:cherp_app/utils/progress_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -101,15 +101,15 @@ class _MySettingsState extends State<MySettings> {
                       );
                     });
                 await FirebaseFirestore.instance
-                    .collection("profile")
+                    .collection("users")
                     .doc(userId)
-                    .set({
+                    .update({
                   'userName': userNameController.text.toString(),
                   'userImg': "",
                   'userProfileBio': profileBioController.text.toString(),
                   'fullName': fullNameController.text.toString(),
-                  "userId": userId,
                 });
+                Navigator.pop(context);
               },
               child: Text(
                 "Save",
