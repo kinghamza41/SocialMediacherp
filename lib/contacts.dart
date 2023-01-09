@@ -1,27 +1,3 @@
-// // ignore_for_file: unnecessary_import
-
-// import 'package:flutter/material.dart';
-
-// class ContactsScreen extends StatefulWidget {
-//   const ContactsScreen({super.key});
-
-//   @override
-//   State<ContactsScreen> createState() => _ContactsScreenState();
-// }
-
-// class _ContactsScreenState extends State<ContactsScreen> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Column(
-//         children: [
-//           Container(),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
 // ignore_for_file: use_build_context_synchronously, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, prefer_const_constructors, library_private_types_in_public_api, avoid_print, unnecessary_null_comparison, prefer_typing_uninitialized_variables
 
 import 'dart:developer';
