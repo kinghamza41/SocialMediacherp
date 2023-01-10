@@ -1,8 +1,9 @@
-// ignore_for_file: avoid_unnecessary_containers, prefer_const_constructors, avoid_print, unnecessary_brace_in_string_interps
+// ignore_for_file: avoid_unnecessary_containers, prefer_const_constructors, avoid_print, unnecessary_brace_in_string_interps, unnecessary_null_comparison
 
 import 'package:cherp_app/Comments/comment_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
@@ -20,6 +21,7 @@ class _MyCommentsState extends State<MyComments> {
   String? userNumber;
   String? userImg;
   String? postId;
+  int? totalComments;
   TextEditingController commentDescController = TextEditingController();
 
   Future<void> getSenderUserDetails() async {
@@ -80,7 +82,43 @@ class _MyCommentsState extends State<MyComments> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: CommentCards(),
+        body: StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection("your_cherps")
+              .doc(postId)
+              .collection('comments')
+              .snapshots(),
+          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) {
+              return Center(
+                child: Text("Something went wrong"),
+              );
+            }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CupertinoActivityIndicator(),
+              );
+            }
+            if (snapshot.data!.docs.isEmpty) {
+              return Center(
+                child: Text("No data found"),
+              );
+            }
+            if (snapshot != null && snapshot.data != null) {
+              print(snapshot.data!.docs.length);
+              totalComments = snapshot.data!.docs.length;
+              return ListView.builder(
+                itemCount: totalComments,
+                itemBuilder: (context, index) {
+                  return CommentCards(
+                    snap: snapshot.data!.docs[index].data(),
+                  );
+                },
+              );
+            }
+            return Container();
+          },
+        ),
         bottomNavigationBar: SafeArea(
           child: Container(
             height: kToolbarHeight,
@@ -109,6 +147,7 @@ class _MyCommentsState extends State<MyComments> {
                 InkWell(
                   onTap: (() async {
                     String commentId = Uuid().v4();
+
                     try {
                       if (commentDescController.text.isNotEmpty) {
                         await FirebaseFirestore.instance
@@ -122,6 +161,16 @@ class _MyCommentsState extends State<MyComments> {
                           'uid': userId,
                           'text': commentDescController.text.toString(),
                           'datePublished': DateTime.now(),
+                          'commentId': commentId,
+                        }).then(
+                          (value) => commentDescController.clear(),
+                        );
+
+                        await FirebaseFirestore.instance
+                            .collection("your_cherps")
+                            .doc(postId)
+                            .update({
+                          'cherpTotalComment': totalComments,
                         });
                       } else {
                         print('Text is empty');

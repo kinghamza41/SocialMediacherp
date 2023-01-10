@@ -1,4 +1,4 @@
-// ignore_for_file: camel_case_types, non_constant_identifier_names, prefer_const_constructors, unnecessary_null_comparison, avoid_print, unused_local_variable
+// ignore_for_file: camel_case_types, non_constant_identifier_names, prefer_const_constructors, unnecessary_null_comparison, avoid_print, unused_local_variable, await_only_futures
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -89,8 +89,21 @@ class _TweetsState extends State<Tweets> {
   String? cherpDesc;
   String? postImg;
   int? cherpLikes;
+  var totalComments;
+  // Future<void> getComments(String postID) async {
+  //   final getCommentData = await FirebaseFirestore.instance
+  //       .collection("your_cherps")
+  //       .doc(postID)
+  //       .collection("comments")
+  //       .snapshots();
+  //   setState(() {
+  //     print(getCommentData.toString());
+  //   });
+  // }
+
   @override
   Widget build(BuildContext context) {
+    // print("object");
     return StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection("your_cherps")
@@ -131,10 +144,22 @@ class _TweetsState extends State<Tweets> {
                   targetUserImg = snapshot.data!.docs[index]['targetUserImg'];
                   postImg = snapshot.data!.docs[index]['postImg'];
                   cherpLikes = snapshot.data!.docs[index]['cherpLikes'];
+                  var postId = snapshot.data!.docs[index]['postId'];
+                  totalComments =
+                      snapshot.data!.docs[index]['cherpTotalComment'];
+
+                  //  getComments(postId);
+
                   List cherpLikeUserList =
                       snapshot.data!.docs[index]['cherpLikeUserList'];
-                  return TheCard(senderUserName, cherpLikes!, documentId,
-                      cherpLikeUserList);
+                  print(cherpLikeUserList.toString());
+                  return TheCard(
+                    senderUserName,
+                    cherpLikes!,
+                    documentId,
+                    cherpLikeUserList,
+                    totalComments,
+                  );
                 });
           }
           return Container();

@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, non_constant_identifier_names, must_be_immutable, unused_import, await_only_futures, prefer_const_constructors_in_immutables
+// ignore_for_file: prefer_const_constructors, non_constant_identifier_names, must_be_immutable, unused_import, await_only_futures, prefer_const_constructors_in_immutables, avoid_print
 
 import 'dart:async';
 
@@ -57,6 +57,7 @@ class _MyAppState extends State<MyApp> {
     //   }),
     // );
     // auth();
+    print(user!.uid);
   }
 
   @override
@@ -64,7 +65,7 @@ class _MyAppState extends State<MyApp> {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Twittery",
-      home: TheMain(),
+      home: user != null ? TheMain() : Sign_in(),
       //initialRoute: 'signin',
       // routes: {
       //   "signin": (context) => Sign_in(),

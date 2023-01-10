@@ -1,11 +1,10 @@
-// ignore_for_file: prefer_const_constructors
-
-import 'dart:ui';
+// ignore_for_file: prefer_const_constructors, must_be_immutable
 
 import 'package:flutter/material.dart';
 
 class CommentCards extends StatefulWidget {
-  const CommentCards({super.key});
+  dynamic snap;
+  CommentCards({this.snap, super.key});
 
   @override
   State<CommentCards> createState() => _CommentCardsState();
@@ -35,7 +34,7 @@ class _CommentCardsState extends State<CommentCards> {
               // ignore: prefer_const_literals_to_create_immutables
               children: [
                 Text(
-                  "username",
+                  widget.snap['text'],
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),

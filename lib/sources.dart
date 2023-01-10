@@ -1,5 +1,7 @@
 // ignore_for_file: camel_case_types, constant_identifier_names, must_be_immutable, prefer_const_constructors, avoid_unnecessary_containers, avoid_print
 
+import 'dart:ffi';
+
 import 'package:cherp_app/Comments/comments.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -43,8 +45,10 @@ class TheCard extends StatefulWidget {
   int cherpLikes;
   String? documentId;
   List? cherpLikeUserList;
+  String? totalcomments;
   TheCard(this.senderUserName, this.cherpLikes, this.documentId,
-      this.cherpLikeUserList,
+      this.cherpLikeUserList, this.totalcomments,
+      // this.cherpLikeUserList,
       {Key? key})
       : super(key: key);
 
@@ -55,6 +59,7 @@ class TheCard extends StatefulWidget {
 class _TheCardState extends State<TheCard> {
   User? user;
   bool? isLiked = false;
+  // List cherpUserList = [];
   @override
   void initState() {
     // ignore: todo
@@ -62,6 +67,11 @@ class _TheCardState extends State<TheCard> {
     super.initState();
     // print(senderUserName);
     user = FirebaseAuth.instance.currentUser;
+    print("the card  ${widget.cherpLikeUserList.toString()}");
+    // cherpUserList = widget.cherpLikeUserList!;
+    // print("val $cherpUserList");
+// user =FirebaseAuth.instance.currentUser;
+    print(user);
   }
 
   @override
@@ -215,7 +225,9 @@ class _TheCardState extends State<TheCard> {
                       Icon(Icons.comment, color: Colors.white),
                       const SizedBox(width: 5),
                       Text(
-                        Numeral(1000).format(),
+                        Numeral(int.parse(widget.totalcomments.toString()))
+                            .format()
+                            .toString(),
                         style: sources.font_style(
                           color: Colors.white,
                           fontSize: 15,
