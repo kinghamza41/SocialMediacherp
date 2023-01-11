@@ -34,13 +34,13 @@ class _CommentCardsState extends State<CommentCards> {
               // ignore: prefer_const_literals_to_create_immutables
               children: [
                 Text(
-                  widget.snap['text'],
+                  widget.snap['name'],
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  "Some description to insert",
+                  widget.snap['text'],
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
@@ -50,7 +50,7 @@ class _CommentCardsState extends State<CommentCards> {
                     top: 4,
                   ),
                   child: Text(
-                    '23/12/2022',
+                    DateTime.parse(widget.snap['datePublished']).toString(),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,

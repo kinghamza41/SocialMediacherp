@@ -40,8 +40,11 @@ dependencies:
   firebase_auth: ^4.2.4
   flutter_svg: ^1.1.6
   google_fonts: ^3.0.1
+  image_picker: ^0.8.5+3
+  firebase_storage: ^11.0.10
   carousel_slider: ^4.2.1
   intl_phone_field: ^3.1.0
+  fluttertoast: ^8.0.9
   pinput: ^2.2.21
   get: ^4.6.5
   cloud_firestore: ^4.3.1
@@ -49,6 +52,7 @@ dependencies:
   flutter_contacts: ^1.1.5+1
   numeral: ^2.0.1
   uuid: ^3.0.7
+  permission_handler: ^10.2.0
 
 
 dev_dependencies:

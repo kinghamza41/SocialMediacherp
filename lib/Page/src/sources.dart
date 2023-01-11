@@ -1,8 +1,12 @@
-// ignore_for_file: camel_case_types, non_constant_identifier_names, prefer_const_constructors, unnecessary_null_comparison, avoid_print, unused_local_variable, await_only_futures
+// ignore_for_file: camel_case_types, non_constant_identifier_names, prefer_const_constructors, unnecessary_null_comparison, avoid_print, unused_local_variable, await_only_futures, use_build_context_synchronously
 
+import 'package:cherp_app/widget/flutter_toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../sources.dart';
 
 class settings_info {
@@ -54,6 +58,7 @@ class MyAvatar extends StatelessWidget {
 
   final double aspect;
 
+//    Future<void> selectImages(type) async {
   @override
   Widget build(BuildContext context) => Container(
         decoration: BoxDecoration(
@@ -63,9 +68,64 @@ class MyAvatar extends StatelessWidget {
             width: 2,
           ),
         ),
-        child: CircleAvatar(
-          foregroundImage: const AssetImage("assets/Placeholder/P2.png"),
-          radius: MediaQuery.of(context).size.width * aspect,
+        child: GestureDetector(
+          onTap: () async {
+            // PermissionStatus galleryPermission =
+            //                 await Permission.storage.request();
+
+            //             if (galleryPermission == PermissionStatus.granted) {
+            //               showDialog(
+            //                 context: context,
+            //                 builder: (BuildContext context) {
+            //                   return AlertDialog(
+            //                     title: const Text("Pick Image:"),
+            //                     actions: [
+            //                       ListTile(
+            //                         leading: const Icon(Icons.camera),
+            //                         title: const Text('Camera'),
+            //                         onTap: () {
+            //                           // chooseImage("camera");
+            //                           Navigator.pop(context);
+
+            //                           selectImages("camera");
+            //                         },
+            //                       ),
+            //                       ListTile(
+            //                         leading: const Icon(Icons.photo),
+            //                         title: const Text('Gallery'),
+            //                         onTap: () {
+            //                           // chooseImage("Gallery");
+            //                           Navigator.pop(context);
+            //                           selectImages("gallery");
+            //                         },
+            //                       ),
+            //                     ],
+            //                   );
+            //                 },
+            //               );
+            //             }
+            //             if (galleryPermission == PermissionStatus.denied) {
+            //               DisplayFlutterToast(
+            //                   "Please Allow Permission", context);
+            //             }
+            //             if (galleryPermission ==
+            //                 PermissionStatus.permanentlyDenied) {
+            //               DisplayFlutterToast(
+            //                   "Please Allow Permission For Further Usage",
+            //                   context);
+            //               openAppSettings();
+            //             }
+            //           },
+            //         ),
+            // ],
+          },
+          child: Container(
+            //  height: MediaQuery.of(context).size.height,
+            child: CircleAvatar(
+              foregroundImage: const AssetImage("assets/Placeholder/P2.png"),
+              radius: MediaQuery.of(context).size.width * aspect,
+            ),
+          ),
         ),
       );
 }
