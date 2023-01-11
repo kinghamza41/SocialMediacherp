@@ -65,7 +65,8 @@ class _MyAppState extends State<MyApp> {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Twittery",
-      home: user != null ? TheMain() : Sign_in(),
+      // user != null ? TheMain() : Sign_in()
+      home: MySettings(),
       //initialRoute: 'signin',
       // routes: {
       //   "signin": (context) => Sign_in(),

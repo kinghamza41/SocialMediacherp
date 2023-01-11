@@ -1,6 +1,7 @@
-// ignore_for_file: prefer_const_constructors, must_be_immutable
+// ignore_for_file: prefer_const_constructors, must_be_immutable, unused_field
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class CommentCards extends StatefulWidget {
   dynamic snap;
@@ -11,6 +12,11 @@ class CommentCards extends StatefulWidget {
 }
 
 class _CommentCardsState extends State<CommentCards> {
+  // int date =  widget.snap['datePublished'];
+  // final Timestamp _dateTime =;
+
+  // var _convertedTimestamp =
+  //     DateTime.parse(_dateTime.toDate().toString());
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -50,7 +56,8 @@ class _CommentCardsState extends State<CommentCards> {
                     top: 4,
                   ),
                   child: Text(
-                    DateTime.parse(widget.snap['datePublished']).toString(),
+                    DateFormat.yMMMd()
+                        .format(widget.snap['datePublished'].toDate()),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,

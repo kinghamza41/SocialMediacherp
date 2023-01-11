@@ -1,7 +1,5 @@
 // ignore_for_file: camel_case_types, constant_identifier_names, must_be_immutable, prefer_const_constructors, avoid_unnecessary_containers, avoid_print
 
-import 'dart:ffi';
-
 import 'package:cherp_app/Comments/comments.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -45,7 +43,7 @@ class TheCard extends StatefulWidget {
   int cherpLikes;
   String? documentId;
   List? cherpLikeUserList;
-  String? totalcomments;
+  int? totalcomments;
   TheCard(this.senderUserName, this.cherpLikes, this.documentId,
       this.cherpLikeUserList, this.totalcomments,
       // this.cherpLikeUserList,

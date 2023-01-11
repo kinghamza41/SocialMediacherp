@@ -1,9 +1,17 @@
-// ignore_for_file: non_constant_identifier_names, file_names, avoid_print, use_build_context_synchronously
+// ignore_for_file: non_constant_identifier_names, file_names, avoid_print, use_build_context_synchronously, prefer_const_constructors, unused_field, unnecessary_brace_in_string_interps
 
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cherp_app/services/userProfileServices.dart';
 import 'package:cherp_app/utils/progress_dialog.dart';
+import 'package:cherp_app/widget/flutter_toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'src/sources.dart';
 import '../sources.dart';
@@ -26,6 +34,12 @@ class _MySettingsState extends State<MySettings> {
   User? user = FirebaseAuth.instance.currentUser;
   dynamic userName;
   dynamic userId;
+  String? userImg;
+  String? fullName;
+  String? userProfileBio;
+  // File? profileImage;
+  File? selectedImage;
+  final GlobalKey<FormState> _formKey = GlobalKey();
 
   Future<void> getUserDetails() async {
     if (user != null) {
@@ -39,10 +53,41 @@ class _MySettingsState extends State<MySettings> {
           .get();
       userName = snapshot.docs.first['userName'];
       userId = snapshot.docs.first['userId'];
+      userImg = snapshot.docs.first['userImg'];
+      fullName = snapshot.docs.first['fullName'];
+      userProfileBio = snapshot.docs.first['userProfileBio'];
+
       setState(() {
         print(userId);
       });
     }
+  }
+
+  Future<void> chooseImage(type, BuildContext context) async {
+    // ignore: prefer_typing_uninitialized_variables
+    var image;
+
+    if (type == "Gallery") {
+      // ignore: prefer_equal_for_default_values
+      // Navigator.of(context).pop();
+      image = await ImagePicker()
+          .pickImage(source: ImageSource.gallery, imageQuality: 20);
+      // Navigator.of(context).pop();
+    } else if (type == "Camera") {
+      // ignore: prefer_equal_for_default_values
+      // Navigator.of(context).pop();
+      image = await ImagePicker()
+          .pickImage(source: ImageSource.camera, imageQuality: 20);
+      // Navigator.of(context).pop();
+    }
+    if (image != null) {
+      // Navigator.of(context).pop();
+      setState(() {
+        selectedImage = File(image.path);
+        print(" photos link ${selectedImage}");
+      });
+    }
+    setState(() {});
   }
 
   @override
@@ -51,6 +96,7 @@ class _MySettingsState extends State<MySettings> {
     // TODO: implement initState
     super.initState();
     getUserDetails();
+    print(selectedImage);
   }
 
   @override
@@ -68,7 +114,94 @@ class _MySettingsState extends State<MySettings> {
           bottom: MediaQuery.of(context).size.height * 0.1,
         ),
         children: [
-          const MyAvatar(),
+         //  MyAvatar(),
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white,
+                width: 2,
+              ),
+            ),
+            child: GestureDetector(
+              onTap: () async {
+                PermissionStatus galleryPermission =
+                    await Permission.storage.request();
+                print(galleryPermission);
+
+                if (galleryPermission == PermissionStatus.granted) {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text("Pick Image:"),
+                        actions: [
+                          ListTile(
+                            leading: const Icon(Icons.camera),
+                            title: const Text('Camera'),
+                            onTap: () {
+                              // chooseImage("camera");
+                              Navigator.pop(context);
+
+                              // selectImages("camera");
+                              chooseImage("Camera", context);
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.photo),
+                            title: const Text('Gallery'),
+                            onTap: () {
+                              chooseImage("Gallery", context);
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+                if (galleryPermission == PermissionStatus.denied) {
+                  DisplayFlutterToast("Please Allow Permission", context);
+                }
+                if (galleryPermission == PermissionStatus.permanentlyDenied) {
+                  DisplayFlutterToast(
+                      "Please Allow Permission For Further Usage", context);
+                  openAppSettings();
+                }
+              },
+              child: CircleAvatar(
+                // backgroundImage: ,
+                backgroundColor: Colors.transparent,
+// MediaQuery.of(context).size.width * widget.aspect
+                // foregroundImage: const AssetImage("assets/Placeholder/P2.png"),
+                radius: 60,
+                child: ClipOval(
+                  // borderRadius: BorderRadius.circular(10),
+                  // clipBehavior: Clip.antiAlias,
+                  child: selectedImage != null
+                      ? Image.file(
+                          selectedImage!,
+                          fit: BoxFit.fill,
+                          // height: 10.h,
+                          // width: 30.w,
+                        )
+                      : CachedNetworkImage(
+                          // width: 12.w,
+                          // height: 6.h,
+                          fit: BoxFit.fitHeight,
+                          placeholder: (context, url) => ColoredBox(
+                            color: Colors.transparent,
+                            child: Center(
+                              child: CupertinoActivityIndicator(
+                                  // color: appMainColor,
+                                  ),
+                            ),
+                          ),
+                          imageUrl: selectedImage.toString(),
+                        ),
+                ),
+              ),
+            ),
+          ),
           SizedBox(height: MediaQuery.of(context).size.height * 0.05),
           text_field(context, "Username", userNameController),
           my_spacing,
@@ -92,24 +225,27 @@ class _MySettingsState extends State<MySettings> {
             ),
             child: TextButton(
               onPressed: () async {
-                showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (BuildContext context) {
-                      return ProgressDialog(
-                        message: "Please Wait..",
-                      );
-                    });
-                await FirebaseFirestore.instance
-                    .collection("users")
-                    .doc(userId)
-                    .update({
-                  'userName': userNameController.text.toString(),
-                  'userImg': "",
-                  'userProfileBio': profileBioController.text.toString(),
-                  'fullName': fullNameController.text.toString(),
-                });
-                Navigator.pop(context);
+                if (selectedImage == null &&
+                    userNameController.text.trim() != userName &&
+                    fullNameController.text.trim() != fullName &&
+                    profileBioController.text.trim() != userProfileBio) {
+                  await UpdateOnlyFields(
+                    context,
+                    userNameController,
+                    fullNameController,
+                    profileBioController,
+                  );
+                } else {
+                  await updateUserProfileData(
+                      context,
+                      selectedImage,
+                      userNameController,
+                      fullNameController,
+                      profileBioController);
+                }
+                print(userId);
+
+                print("profile image ${selectedImage.toString()}");
               },
               child: Text(
                 "Save",
