@@ -12,11 +12,6 @@ class CommentCards extends StatefulWidget {
 }
 
 class _CommentCardsState extends State<CommentCards> {
-  // int date =  widget.snap['datePublished'];
-  // final Timestamp _dateTime =;
-
-  // var _convertedTimestamp =
-  //     DateTime.parse(_dateTime.toDate().toString());
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -61,6 +56,65 @@ class _CommentCardsState extends State<CommentCards> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: 2,
+                  ),
+                  child: TextButton(
+                    onPressed: () {
+                      // print('click');
+                      // showDialog(
+                      //     context: context,
+                      //     barrierDismissible: false,
+                      //     builder: (BuildContext context) {
+                      //       return ProgressDialog(
+                      //         message: "Please Wait..",
+                      //       );
+                      //     });
+                      Container(
+                        height: kToolbarHeight,
+                        margin: EdgeInsets.only(bottom: 50),
+                        padding: EdgeInsets.only(left: 16, right: 8),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 16, right: 8),
+                                child: TextField(
+                                  // controller: commentDescController,
+                                  decoration: InputDecoration(
+                                      hintText: "Write Something",
+                                      border: InputBorder.none),
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              onTap: (() async {}),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8.0, vertical: 8.0),
+                                child: Text(
+                                  "Post",
+                                  style: TextStyle(color: Colors.blueAccent),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    child: Text(
+                      'Reply',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                   ),
                 ),

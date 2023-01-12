@@ -7,7 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sizer/sizer.dart';
+import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
 
 class MyComments extends StatefulWidget {
@@ -25,6 +25,7 @@ class _MyCommentsState extends State<MyComments> {
   String? userImg;
   String? postId;
   int? totalComments;
+  String? getPostDocumentId;
   TextEditingController commentDescController = TextEditingController();
 
   Future<void> getSenderUserDetails() async {
@@ -48,15 +49,12 @@ class _MyCommentsState extends State<MyComments> {
     }
   }
 
-  Future<void> getCherpDetails() async {
+  Future<void> getCherpDetails(String? getPostDocumentId) async {
     if (user != null) {
       //  await FirebaseFirestore.instance.collection("users").get();
       final snapshot = await FirebaseFirestore.instance
           .collection("your_cherps")
-          .where(
-            "senderUserId",
-            isEqualTo: user!.uid,
-          )
+          .where('postId', isEqualTo: getPostDocumentId)
           .get();
       postId = snapshot.docs.first['postId'];
       // userId = snapshot.docs.first['userId'];
@@ -64,7 +62,7 @@ class _MyCommentsState extends State<MyComments> {
       // userImg = snapshot.docs.first['userImg'];
 
       setState(() {
-        print(postId);
+        print(' post id  $postId');
       });
     }
   }
@@ -75,7 +73,12 @@ class _MyCommentsState extends State<MyComments> {
     // TODO: implement initState
     super.initState();
     getSenderUserDetails();
-    getCherpDetails();
+    // print(postId);
+    getPostDocumentId = Get.arguments['postDocumentId'];
+
+    getCherpDetails(getPostDocumentId);
+
+    print('postdocumentId  ${Get.arguments['postDocumentId']}');
   }
 
   // Future<String> postComment() async{
@@ -88,7 +91,7 @@ class _MyCommentsState extends State<MyComments> {
         body: StreamBuilder(
           stream: FirebaseFirestore.instance
               .collection("your_cherps")
-              .doc(postId)
+              .doc(getPostDocumentId)
               .collection('comments')
               .snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -170,7 +173,7 @@ class _MyCommentsState extends State<MyComments> {
                       if (commentDescController.text.isNotEmpty) {
                         await FirebaseFirestore.instance
                             .collection("your_cherps")
-                            .doc(postId)
+                            .doc(getPostDocumentId)
                             .collection("comments")
                             .doc(commentId)
                             .set({
@@ -179,6 +182,7 @@ class _MyCommentsState extends State<MyComments> {
                           'uid': userId,
                           'text': commentDescController.text.toString(),
                           'datePublished': DateTime.now(),
+                          'postId': postId,
                           'commentId': commentId,
                         }).then(
                           (value) => commentDescController.clear(),
@@ -186,7 +190,7 @@ class _MyCommentsState extends State<MyComments> {
 
                         await FirebaseFirestore.instance
                             .collection("your_cherps")
-                            .doc(postId)
+                            .doc(getPostDocumentId)
                             .update({
                           'cherpTotalComment': totalComments,
                         });

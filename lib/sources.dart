@@ -1,4 +1,4 @@
-// ignore_for_file: camel_case_types, constant_identifier_names, must_be_immutable, prefer_const_constructors, avoid_unnecessary_containers, avoid_print
+// ignore_for_file: camel_case_types, constant_identifier_names, must_be_immutable, prefer_const_constructors, avoid_unnecessary_containers, avoid_print, non_constant_identifier_names
 
 import 'package:cherp_app/Comments/comments.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -17,19 +17,96 @@ class sources {
   static const avatar_02 = "assets/Placeholder/P2.png";
 
   static const image_01 = "assets/Placeholder/Image1.png";
+
+  static var is_dark = true;
+  //static var is_dark = ThemeMode.system == ThemeMode.dark;
+
+  static const color_dark = Colors.black;
+  static const color_light = Colors.white;
+
+  static final color_selected = is_dark ? color_dark : color_light;
+  static final color_TheOther = is_dark ? color_light : color_dark;
+
+  static const background_dark = "assets/background_dark.png";
+  static const background_light = "assets/background_light.png";
+
+  static const background_profile_dark = "assets/background_profile_dark.png";
+  static const background_profile_light = "assets/background_profile_light.png";
+
+  static const icon_video = "assets/Icon/add_video.svg";
+  static const icon_photo = "assets/Icon/add_photo.svg";
+  static const icon_audio = "assets/Icon/add_audio.svg";
+  static const icon_phone = "assets/Icon/add_phone.svg";
+}
+
+class TheButton extends StatefulWidget {
+  const TheButton(
+      {required this.text, this.aspect = 0.07, this.onPressed, super.key});
+
+  final double aspect;
+  final VoidCallback? onPressed;
+  final String text;
+
+  @override
+  State<TheButton> createState() => _TheButtonState();
+}
+
+class _TheButtonState extends State<TheButton> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        // _isPressed should be true when the button is pressed, but set to false when the button is released.
+        onTapDown: (_) => setState(() => _isPressed = true),
+        onTapUp: (_) => setState(() {
+          _isPressed = false;
+          widget.onPressed?.call();
+        }),
+        child: Container(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: _isPressed ? sources.color_TheOther : Colors.yellow,
+            borderRadius: BorderRadius.circular(15),
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: MediaQuery.of(context).size.width * 0.05,
+            vertical: MediaQuery.of(context).size.height * 0.02,
+          ),
+          margin: EdgeInsets.symmetric(
+            vertical: MediaQuery.of(context).size.height * 0.02,
+            horizontal: MediaQuery.of(context).size.width * widget.aspect,
+          ),
+          child: Text(
+            widget.text,
+            style: sources.font_style(
+              color: Colors.black,
+              fontSize: 18,
+            ),
+          ),
+        ),
+      );
 }
 
 class DarkOne extends StatelessWidget {
-  const DarkOne({required this.child, Key? key}) : super(key: key);
+  const DarkOne({this.profile = false, required this.child, Key? key})
+      : super(key: key);
 
   final Widget child;
-
+  final bool profile;
   @override
   Widget build(BuildContext context) => Scaffold(
         body: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage(sources.background),
+              image: AssetImage(
+                sources.is_dark
+                    ? profile
+                        ? sources.background_profile_dark
+                        : sources.background_dark
+                    : profile
+                        ? sources.background_profile_light
+                        : sources.background_light,
+              ),
               fit: BoxFit.cover,
             ),
           ),
@@ -44,8 +121,10 @@ class TheCard extends StatefulWidget {
   String? documentId;
   List? cherpLikeUserList;
   int? totalcomments;
+
+  String? targetUserName;
   TheCard(this.senderUserName, this.cherpLikes, this.documentId,
-      this.cherpLikeUserList, this.totalcomments,
+      this.cherpLikeUserList, this.totalcomments, this.targetUserName,
       // this.cherpLikeUserList,
       {Key? key})
       : super(key: key);
@@ -103,7 +182,7 @@ class _TheCardState extends State<TheCard> {
                 // widget.senderUserName.toString(),
                 name,
                 style: sources.font_style(
-                  color: Colors.white,
+                  color: sources.color_TheOther,
                   fontSize: MediaQuery.of(context).size.width * 0.04,
                 ),
               )
@@ -113,7 +192,9 @@ class _TheCardState extends State<TheCard> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.2),
+        color: sources.is_dark
+            ? sources.color_dark.withOpacity(0.2)
+            : sources.color_light,
         borderRadius: BorderRadius.circular(10),
       ),
       margin: EdgeInsets.symmetric(
@@ -138,7 +219,7 @@ class _TheCardState extends State<TheCard> {
               ), // Arrow
               getAvatar(
                   path: sources.avatar_02,
-                  name: widget.senderUserName.toString()),
+                  name: widget.targetUserName.toString()),
             ],
           ), // Avatars
           Text(
@@ -146,7 +227,7 @@ class _TheCardState extends State<TheCard> {
             "tweet. This is just a placeholder for now. I am going to further design "
             "the application.",
             style: sources.font_style(
-              color: Colors.white.withOpacity(0.8),
+              color: sources.color_TheOther.withOpacity(0.8),
               fontSize: 15,
               height: 1.5,
             ),
@@ -212,6 +293,7 @@ class _TheCardState extends State<TheCard> {
               const SizedBox(width: 30),
               GestureDetector(
                 onTap: () {
+                  print(widget.documentId.toString());
                   Get.to(() => MyComments(), arguments: {
                     'postDocumentId': widget.documentId.toString(),
                   });
@@ -222,22 +304,25 @@ class _TheCardState extends State<TheCard> {
                     children: [
                       Icon(Icons.comment, color: Colors.white),
                       const SizedBox(width: 5),
-                      Text(
-                        Numeral(int.parse(widget.totalcomments.toString()))
-                            .format()
-                            .toString(),
-                        style: sources.font_style(
-                          color: Colors.white,
-                          fontSize: 15,
-                        ),
-                      ),
+                      widget.totalcomments == 0
+                          ? Text('')
+                          : Text(
+                              Numeral(int.parse(
+                                      widget.totalcomments.toString()))
+                                  .format()
+                                  .toString(),
+                              style: sources.font_style(
+                                color: sources.color_TheOther,
+                                fontSize: 15,
+                              ),
+                            ),
                     ],
                   ),
                 ),
               ),
 
-              const SizedBox(width: 10),
-              // const Icon(Icons.reply_rounded, color: Colors.white),
+              SizedBox(width: 10),
+              // Icon(Icons.message_rounded, color: sources.color_TheOther),
 
               // Icons
               // const Icon(Icons.share, color: Colors.white),

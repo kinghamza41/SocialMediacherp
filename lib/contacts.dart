@@ -2,6 +2,7 @@
 
 import 'dart:developer';
 
+import 'package:cherp_app/widget/flutter_toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,10 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
   String? senderUserId;
   String? senderUserNumber;
   String? senderUserImg;
-
+  String? targetUserName = '';
+  String? targetUserId = '';
+  String? targetUserNumber = '';
+  String? targetUserImg = '';
   @override
   void initState() {
     super.initState();
@@ -60,6 +64,34 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
       setState(() {
         print(senderUserId);
       });
+    }
+  }
+
+  Future<void> getTargetUserDetails(String targetUserPhoneNumber) async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .where(
+            "phoneNumber",
+            isEqualTo: targetUserPhoneNumber,
+          )
+          .get();
+      if (snapshot.docs.isNotEmpty) {
+        targetUserName = snapshot.docs.first['userName'];
+        targetUserId = snapshot.docs.first['userId'];
+        targetUserNumber = snapshot.docs.first['phoneNumber'];
+        targetUserImg = snapshot.docs.first['userImg'];
+        print(targetUserPhoneNumber);
+        //   print(snapshot.docs.first['phoneNumber']);
+      } else if (snapshot.docs.isEmpty) {
+        ///  call twillio service todo
+        DisplayFlutterToast('Not exist', context);
+      }
+      print(snapshot.docs.first['phoneNumber']);
+
+      setState(() {});
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -111,29 +143,31 @@ class _ContactPageState extends State<ContactPage> {
   User? user = FirebaseAuth.instance.currentUser;
 
   Future<void> getTargetUserDetails(String targetUserPhoneNumber) async {
-    final snapshot = await FirebaseFirestore.instance
-        .collection("users")
-        .where(
-          "phoneNumber",
-          isEqualTo: targetUserPhoneNumber,
-        )
-        .get();
-    print(targetUserPhoneNumber);
-    print(snapshot.docs.first['phoneNumber']);
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .where(
+            "phoneNumber",
+            isEqualTo: targetUserPhoneNumber,
+          )
+          .get();
+      if (snapshot.docs.isNotEmpty) {
+        targetUserName = snapshot.docs.first['userName'];
+        targetUserId = snapshot.docs.first['userId'];
+        targetUserNumber = snapshot.docs.first['phoneNumber'];
+        targetUserImg = snapshot.docs.first['userImg'];
+        print(targetUserPhoneNumber);
+        //   print(snapshot.docs.first['phoneNumber']);
+      } else if (snapshot.docs.isEmpty) {
+        ///  call twillio service todo
+        DisplayFlutterToast('Not exist', context);
+      }
+      print(snapshot.docs.first['phoneNumber']);
 
-    //   if (snapshot.docs == null) {
-    //     targetUserName = '';
-    //     targetUserId = '';
-    //     targetUserImg = '';
-    //     targetUserNumber = '';
-    //     setState(() {});
-    //   } else {
-    //     targetUserName = snapshot.docs.first['userName'];
-    //     targetUserId = snapshot.docs.first['userId'];
-    //     targetUserNumber = snapshot.docs.first['phoneNumber'];
-    //     targetUserImg = snapshot.docs.first['userImg'];
-    //     setState(() {});
-    //   }
+      setState(() {});
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
@@ -141,7 +175,7 @@ class _ContactPageState extends State<ContactPage> {
     // ignore: todo
     // TODO: implement initState
     super.initState();
-    // getTargetUserDetails(widget.contact.phones.first.number);
+    getTargetUserDetails(widget.contact.phones.first.number);
   }
 
   @override
@@ -163,6 +197,8 @@ class _ContactPageState extends State<ContactPage> {
               // if (widget.contact.phones.first.number ==
               //     Get.arguments['targetUserNumber']) {
               String? postId = Uuid().v4();
+              int totalComments = 0;
+
               await FirebaseFirestore.instance
                   .collection("your_cherps")
                   .doc(postId)
@@ -173,10 +209,10 @@ class _ContactPageState extends State<ContactPage> {
                 'senderUserNumber': Get.arguments['senderUserNumber'],
                 'senderUserImg': Get.arguments['senderUserImg'],
                 'postImg': '',
-                'targetUserName': "targetUserName",
-                'targetUserId': "targetUserId",
-                'targetUserImg': "targetUserImg",
-                'cherpTotalComment': '',
+                'targetUserName': targetUserName,
+                'targetUserId': targetUserId,
+                'targetUserImg': targetUserImg,
+                'cherpTotalComment': totalComments,
                 'cherpLikeUserList': [],
                 'postId': postId,
 

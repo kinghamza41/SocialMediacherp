@@ -274,6 +274,7 @@ class _TweetsState extends State<Tweets> {
                     documentId,
                     cherpLikeUserList,
                     totalComments,
+                    targetUserName,
                   );
                 });
           }
