@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_contacts/contact.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'Page/01_home.dart';
@@ -57,7 +58,7 @@ class _MyAppState extends State<MyApp> {
     //   }),
     // );
     // auth();
-    print(user!.uid);
+    // print(user!.uid);
   }
 
   @override
@@ -66,7 +67,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: "Twittery",
       // user != null ? TheMain() : Sign_in()
-      home: MySettings(),
+      home: user != null ? TheMain() : Sign_in(),
       //initialRoute: 'signin',
       // routes: {
       //   "signin": (context) => Sign_in(),

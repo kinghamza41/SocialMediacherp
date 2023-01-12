@@ -3,7 +3,7 @@
 // ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, camel_case_types, unused_local_variable, non_constant_identifier_names, unused_import, file_names, avoid_print, prefer_interpolation_to_compose_strings, unused_field
 
 import 'package:cherp_app/Initial/verification.dart';
-import 'package:cherp_app/utils/progress_dialog.dart';
+import 'package:cherp_app/widget/progress_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

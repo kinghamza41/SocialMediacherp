@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cherp_app/services/userProfileServices.dart';
-import 'package:cherp_app/utils/progress_dialog.dart';
 import 'package:cherp_app/widget/flutter_toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -114,7 +113,7 @@ class _MySettingsState extends State<MySettings> {
           bottom: MediaQuery.of(context).size.height * 0.1,
         ),
         children: [
-         //  MyAvatar(),
+          //  MyAvatar(),
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -192,11 +191,11 @@ class _MySettingsState extends State<MySettings> {
                             color: Colors.transparent,
                             child: Center(
                               child: CupertinoActivityIndicator(
-                                  // color: appMainColor,
-                                  ),
+                                color: Colors.amber,
+                              ),
                             ),
                           ),
-                          imageUrl: selectedImage.toString(),
+                          imageUrl: '$userImg',
                         ),
                 ),
               ),
@@ -225,23 +224,29 @@ class _MySettingsState extends State<MySettings> {
             ),
             child: TextButton(
               onPressed: () async {
-                if (selectedImage == null &&
-                    userNameController.text.trim() != userName &&
-                    fullNameController.text.trim() != fullName &&
-                    profileBioController.text.trim() != userProfileBio) {
-                  await UpdateOnlyFields(
-                    context,
-                    userNameController,
-                    fullNameController,
-                    profileBioController,
-                  );
-                } else {
-                  await updateUserProfileData(
+                if (userNameController.text.trim().isNotEmpty &&
+                    fullNameController.text.trim().isNotEmpty &&
+                    profileBioController.text.trim().isNotEmpty) {
+                  if (selectedImage == null &&
+                      userNameController.text.trim() != userName &&
+                      fullNameController.text.trim() != fullName &&
+                      profileBioController.text.trim() != userProfileBio) {
+                    await updateOnlyFields(
                       context,
-                      selectedImage,
                       userNameController,
                       fullNameController,
-                      profileBioController);
+                      profileBioController,
+                    );
+                  } else {
+                    await updateUserProfileData(
+                        context,
+                        selectedImage,
+                        userNameController,
+                        fullNameController,
+                        profileBioController);
+                  }
+                } else {
+                  DisplayFlutterToast('Your fields are empty', context);
                 }
                 print(userId);
 

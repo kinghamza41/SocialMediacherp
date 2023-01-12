@@ -176,7 +176,7 @@ class _ContactPageState extends State<ContactPage> {
                 'targetUserName': "targetUserName",
                 'targetUserId': "targetUserId",
                 'targetUserImg': "targetUserImg",
-                'cherpComments': [],
+                'cherpTotalComment': '',
                 'cherpLikeUserList': [],
                 'postId': postId,
 

@@ -1,10 +1,13 @@
-// ignore_for_file: avoid_unnecessary_containers, prefer_const_constructors, avoid_print, unnecessary_brace_in_string_interps, unnecessary_null_comparison
+// ignore_for_file: avoid_unnecessary_containers, prefer_const_constructors, avoid_print, unnecessary_brace_in_string_interps, unnecessary_null_comparison, prefer_if_null_operators
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cherp_app/Comments/comment_card.dart';
+import 'package:cherp_app/widget/flutter_toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 import 'package:uuid/uuid.dart';
 
 class MyComments extends StatefulWidget {
@@ -129,9 +132,23 @@ class _MyCommentsState extends State<MyComments> {
               // ignore: prefer_const_literals_to_create_immutables
               children: [
                 CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      "https://as1.ftcdn.net/v2/jpg/03/46/83/96/1000_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg"),
-                  radius: 18,
+                  // backgroundImage:  ,
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      // width: 12.w,
+                      // height: 6.h,
+                      fit: BoxFit.fitWidth,
+                      placeholder: (context, url) => ColoredBox(
+                        color: Colors.transparent,
+                        child: Center(
+                          child: CupertinoActivityIndicator(
+                            color: Colors.amber,
+                          ),
+                        ),
+                      ),
+                      imageUrl: '$userImg',
+                    ),
+                  ),
                 ),
                 Expanded(
                   child: Padding(
@@ -139,7 +156,8 @@ class _MyCommentsState extends State<MyComments> {
                     child: TextField(
                       controller: commentDescController,
                       decoration: InputDecoration(
-                          hintText: "Comment as ${userName}",
+                          hintText:
+                              "Comment as ${userName == null ? 'UserName' : userName}",
                           border: InputBorder.none),
                     ),
                   ),
@@ -173,7 +191,7 @@ class _MyCommentsState extends State<MyComments> {
                           'cherpTotalComment': totalComments,
                         });
                       } else {
-                        print('Text is empty');
+                        DisplayFlutterToast("Please write comment", context);
                       }
                     } catch (e) {
                       print(e.toString());
