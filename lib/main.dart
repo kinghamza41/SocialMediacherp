@@ -35,16 +35,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   User? user;
 
-  Future<void> auth() async {
-    await FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      // if (user == null) {
-      //   Get.to(() => MyHomePage());
-      // } else {
-      //   Get.to(() => Sign_in());
-      // }
-    });
-  }
-
+  
   @override
   void initState() {
     // ignore: todo

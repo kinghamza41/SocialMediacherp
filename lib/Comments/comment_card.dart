@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, must_be_immutable, unused_field
+// ignore_for_file: prefer_const_constructors, must_be_immutable, unused_field, avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -70,47 +70,10 @@ class _CommentCardsState extends State<CommentCards> {
                       child: TextButton(
                         onPressed: () {
                           // print('click');
-                          replyContainer = true;
-                          print(replyContainer);
-                          replyContainer == true
-                              ? Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 1,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    // crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    children: [
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 16, right: 8),
-                                          child: TextField(
-                                            // controller: commentDescController,
-                                            decoration: InputDecoration(
-                                                hintText: "Write Something",
-                                                border: InputBorder.none),
-                                          ),
-                                        ),
-                                      ),
-                                      InkWell(
-                                        onTap: (() async {
-                                          replyContainer = false;
-                                        }),
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 8.0, vertical: 8.0),
-                                          child: Text(
-                                            "Post",
-                                            style: TextStyle(
-                                                color: Colors.blueAccent),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : Container();
+                          setState(() {
+                            replyContainer = true;
+                            print(replyContainer);
+                          });
                         },
                         child: Text(
                           'Reply',
@@ -127,6 +90,43 @@ class _CommentCardsState extends State<CommentCards> {
             ],
           ),
         ),
+        replyContainer
+            ? Padding(
+                padding: const EdgeInsets.only(
+                  top: 1,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  // crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 16, right: 8),
+                        child: TextField(
+                          // controller: commentDescController,
+                          decoration: InputDecoration(
+                              hintText: "Write Something",
+                              border: InputBorder.none),
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: (() async {
+                        replyContainer = false;
+                      }),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 8.0),
+                        child: Text(
+                          "Post",
+                          style: TextStyle(color: Colors.blueAccent),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : Container(),
       ],
     );
   }

@@ -113,7 +113,7 @@ class _MySettingsState extends State<MySettings> {
           bottom: MediaQuery.of(context).size.height * 0.1,
         ),
         children: [
-          //  MyAvatar(),
+          // MyAvatar(),
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -150,6 +150,8 @@ class _MySettingsState extends State<MySettings> {
                             leading: const Icon(Icons.photo),
                             title: const Text('Gallery'),
                             onTap: () {
+                              Navigator.pop(context);
+
                               chooseImage("Gallery", context);
                             },
                           ),
@@ -170,12 +172,11 @@ class _MySettingsState extends State<MySettings> {
               child: CircleAvatar(
                 // backgroundImage: ,
                 backgroundColor: Colors.transparent,
+
 // MediaQuery.of(context).size.width * widget.aspect
                 // foregroundImage: const AssetImage("assets/Placeholder/P2.png"),
                 radius: 60,
                 child: ClipOval(
-                  // borderRadius: BorderRadius.circular(10),
-                  // clipBehavior: Clip.antiAlias,
                   child: selectedImage != null
                       ? Image.file(
                           selectedImage!,
