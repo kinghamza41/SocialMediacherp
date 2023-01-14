@@ -10,14 +10,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
 
-class MyComments extends StatefulWidget {
-  const MyComments({super.key});
+class CommentsReplyScreen extends StatefulWidget {
+  const CommentsReplyScreen({super.key});
 
   @override
-  State<MyComments> createState() => _MyCommentsState();
+  State<CommentsReplyScreen> createState() => _CommentsReplyScreenState();
 }
 
-class _MyCommentsState extends State<MyComments> {
+class _CommentsReplyScreenState extends State<CommentsReplyScreen> {
   User? user = FirebaseAuth.instance.currentUser;
   String? userName;
   String? userId;
@@ -25,7 +25,8 @@ class _MyCommentsState extends State<MyComments> {
   String? userImg;
   String? postId;
   int? totalComments;
-  String? getPostDocumentId;
+  String? getPostCommentId;
+  String? getPostId;
   bool isLoading = true;
   TextEditingController commentDescController = TextEditingController();
 
@@ -74,13 +75,13 @@ class _MyCommentsState extends State<MyComments> {
     // ignore: todo
     // TODO: implement initState
     super.initState();
-    getSenderUserDetails();
+    // getSenderUserDetails();
     // print(postId);
-    getPostDocumentId = Get.arguments['postDocumentId'];
+    getPostCommentId = Get.arguments['commentId'];
+    getPostId = Get.arguments['postId'];
+    //getCherpDetails(getPostDocumentId);
 
-    getCherpDetails(getPostDocumentId);
-
-    print('postdocumentId  ${Get.arguments['postDocumentId']}');
+    print('postCommentId  ${Get.arguments['commentId']}');
   }
 
   // Future<String> postComment() async{
@@ -97,8 +98,10 @@ class _MyCommentsState extends State<MyComments> {
             : StreamBuilder(
                 stream: FirebaseFirestore.instance
                     .collection("your_cherps")
-                    .doc(getPostDocumentId)
+                    .doc(getPostId)
                     .collection('comments')
+                    .doc(getPostCommentId)
+                    .collection('replies')
                     .snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.hasError) {
@@ -166,7 +169,7 @@ class _MyCommentsState extends State<MyComments> {
                       controller: commentDescController,
                       decoration: InputDecoration(
                           hintText:
-                              "Comment as ${userName == null ? 'UserName' : userName}",
+                              "Reply as ${userName == null ? 'UserName' : userName}",
                           border: InputBorder.none),
                     ),
                   ),
@@ -177,29 +180,29 @@ class _MyCommentsState extends State<MyComments> {
 
                     try {
                       if (commentDescController.text.isNotEmpty) {
-                        await FirebaseFirestore.instance
-                            .collection("your_cherps")
-                            .doc(getPostDocumentId)
-                            .collection("comments")
-                            .doc(commentId)
-                            .set({
-                          "profilePic": userImg,
-                          'name': userName,
-                          'uid': userId,
-                          'text': commentDescController.text.toString(),
-                          'datePublished': DateTime.now(),
-                          'postId': postId,
-                          'commentId': commentId,
-                        }).then(
-                          (value) => commentDescController.clear(),
-                        );
+                        // await FirebaseFirestore.instance
+                        //     .collection("your_cherps")
+                        //     .doc(getPostDocumentId)
+                        //     .collection("comments")
+                        //     .doc(commentId)
+                        //     .set({
+                        //   "profilePic": userImg,
+                        //   'name': userName,
+                        //   'uid': userId,
+                        //   'text': commentDescController.text.toString(),
+                        //   'datePublished': DateTime.now(),
+                        //   'postId': postId,
+                        //   'commentId': commentId,
+                        // }).then(
+                        //   (value) => commentDescController.clear(),
+                        // );
 
-                        await FirebaseFirestore.instance
-                            .collection("your_cherps")
-                            .doc(getPostDocumentId)
-                            .update({
-                          'cherpTotalComment': totalComments,
-                        });
+                        // await FirebaseFirestore.instance
+                        //     .collection("your_cherps")
+                        //     .doc(getPostDocumentId)
+                        //     .update({
+                        //   'cherpTotalComment': totalComments,
+                        // });
                       } else {
                         DisplayFlutterToast("Please write comment", context);
                       }

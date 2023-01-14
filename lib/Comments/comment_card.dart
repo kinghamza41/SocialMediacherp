@@ -1,6 +1,8 @@
 // ignore_for_file: prefer_const_constructors, must_be_immutable, unused_field, avoid_print
 
+import 'package:cherp_app/Comments/comments_reply.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class CommentCards extends StatefulWidget {
@@ -69,10 +71,14 @@ class _CommentCardsState extends State<CommentCards> {
                       ),
                       child: TextButton(
                         onPressed: () {
+                          Get.to(() => CommentsReplyScreen(), arguments: {
+                            'commentId': widget.snap['commentId'],
+                            'postId':widget.snap['postId'],
+                          });
                           // print('click');
                           setState(() {
-                            replyContainer = true;
-                            print(replyContainer);
+                            // replyContainer = true;
+                            //  print(replyContainer);
                           });
                         },
                         child: Text(

@@ -213,66 +213,77 @@ class _SearchTweetsState extends State<SearchTweets> {
   @override
   Widget build(BuildContext context) {
     // print("object");
-    return StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection("your_cherps")
-            .orderBy('createdAt', descending: true)
-            .snapshots(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Text("Something went wrong"),
-            );
-          }
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CupertinoActivityIndicator(),
-            );
-          }
-          if (snapshot.data!.docs.isEmpty) {
-            return Center(
-              child: Text("No data found"),
-            );
-          }
-          if (snapshot != null && snapshot.data != null) {
-            print(snapshot.data!.docs.length);
+    return widget.searchCorntroller.text.isNotEmpty
+        ? StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection("your_cherps")
+                // .where('senderUserName',
+                //     isGreaterThanOrEqualTo:
+                //         searchCorntroller.text.trim())
+                .where('cherpDesc',
+                    isGreaterThanOrEqualTo:
+                        widget.searchCorntroller.text.trim())
+                .snapshots(),
+            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.hasError) {
+                return Center(
+                  child: Text("Something went wrong"),
+                );
+              }
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CupertinoActivityIndicator(),
+                );
+              }
+              if (snapshot.data!.docs.isEmpty) {
+                return Center(
+                  child: Text("No data found"),
+                );
+              }
+              if (snapshot != null && snapshot.data != null) {
+                print(snapshot.data!.docs.length);
 
-            return ListView.builder(
-                itemCount: snapshot.data!.docs.length,
-                padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * 0.05,
-                ),
-                itemBuilder: (context, index) {
-                  var documentId = snapshot.data!.docs[index].id;
-                  print('documentId $documentId');
-                  senderUserName = snapshot.data!.docs[index]['senderUserName'];
+                return ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.05,
+                    ),
+                    itemBuilder: (context, index) {
+                      var documentId = snapshot.data!.docs[index].id;
+                      print('documentId $documentId');
+                      senderUserName =
+                          snapshot.data!.docs[index]['senderUserName'];
 
-                  senderUserImg = snapshot.data!.docs[index]['senderUserImg'];
-                  cherpDesc = snapshot.data!.docs[index]['cherpDesc'];
-                  targetUserName = snapshot.data!.docs[index]['targetUserName'];
-                  targetUserImg = snapshot.data!.docs[index]['targetUserImg'];
-                  postImg = snapshot.data!.docs[index]['postImg'];
-                  cherpLikes = snapshot.data!.docs[index]['cherpLikes'];
-                  var postId = snapshot.data!.docs[index]['postId'];
-                  totalComments =
-                      snapshot.data!.docs[index]['cherpTotalComment'];
+                      senderUserImg =
+                          snapshot.data!.docs[index]['senderUserImg'];
+                      cherpDesc = snapshot.data!.docs[index]['cherpDesc'];
+                      targetUserName =
+                          snapshot.data!.docs[index]['targetUserName'];
+                      targetUserImg =
+                          snapshot.data!.docs[index]['targetUserImg'];
+                      postImg = snapshot.data!.docs[index]['postImg'];
+                      cherpLikes = snapshot.data!.docs[index]['cherpLikes'];
+                      var postId = snapshot.data!.docs[index]['postId'];
+                      totalComments =
+                          snapshot.data!.docs[index]['cherpTotalComment'];
 
-                  //  getComments(postId);
+                      //  getComments(postId);
 
-                  List cherpLikeUserList =
-                      snapshot.data!.docs[index]['cherpLikeUserList'];
-                  print(cherpLikeUserList.toString());
-                  return TheCard(
-                    senderUserName,
-                    cherpLikes!,
-                    documentId,
-                    cherpLikeUserList,
-                    totalComments,
-                    targetUserName,
-                  );
-                });
-          }
-          return Container();
-        });
+                      List cherpLikeUserList =
+                          snapshot.data!.docs[index]['cherpLikeUserList'];
+                      print(cherpLikeUserList.toString());
+                      return TheCard(
+                        senderUserName,
+                        cherpLikes!,
+                        documentId,
+                        cherpLikeUserList,
+                        totalComments,
+                        targetUserName,
+                      );
+                    });
+              }
+              return Container();
+            })
+        : Container();
   }
 }
