@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names, file_names, avoid_print, use_build_context_synchronously, prefer_const_constructors, unused_field, unnecessary_brace_in_string_interps, prefer_if_null_operators, unnecessary_null_comparison
+// ignore_for_file: non_constant_identifier_names, file_names, avoid_print, use_build_context_synchronously, prefer_const_constructors, unused_field, unnecessary_brace_in_string_interps, prefer_if_null_operators, unnecessary_null_comparison, avoid_single_cascade_in_expression_statements
 
 import 'dart:io';
 
@@ -30,6 +30,10 @@ class _MySettingsState extends State<MySettings> {
   TextEditingController fullNameController = TextEditingController();
 
   TextEditingController profileBioController = TextEditingController();
+  TextEditingController userNameAssignController = TextEditingController();
+  TextEditingController fullNameAssignController = TextEditingController();
+  TextEditingController profileBioAssignController = TextEditingController();
+
   User? user = FirebaseAuth.instance.currentUser;
   dynamic userName;
   dynamic userId;
@@ -39,6 +43,10 @@ class _MySettingsState extends State<MySettings> {
   // File? profileImage;
   File? selectedImage;
   bool isLoading = true;
+  String getSenderPostDocId = '';
+  String getSenderPostCommentDocId = '';
+  String getProfilePicForComments = '';
+
   final GlobalKey<FormState> _formKey = GlobalKey();
 
   Future<void> getUserDetails() async {
@@ -64,6 +72,49 @@ class _MySettingsState extends State<MySettings> {
     }
   }
 
+  Future<void> getSenderPostId() async {
+    if (user != null) {
+      //  await FirebaseFirestore.instance.collection("users").get();
+      final snapshot = await FirebaseFirestore.instance
+          .collection("your_cherps")
+          .where(
+            "senderUserId",
+            isEqualTo: user!.uid,
+          )
+          .get();
+
+      getSenderPostDocId = snapshot.docs.first['postId'];
+      // if (getSenderPostDocId != null) {
+      //   getSenderPostCommentDetail(getSenderPostDocId);
+      // }
+
+      setState(() {
+        //isLoading = false;
+        print(getSenderPostDocId);
+      });
+    }
+  }
+
+  // Future<void> getSenderPostCommentDetail(String getSenderPostDocId) async {
+  //   if (user != null) {
+  //     //  await FirebaseFirestore.instance.collection("users").get();
+  //     final snapshot = await FirebaseFirestore.instance
+  //         .collection("your_cherps")
+  //         .doc('d1593778-db4f-4eda-b3ba-65a42f6cafab')
+  //         .collection('comments')
+  //         .get();
+  //     // getSenderPostCommentDocId = snapshot;
+  //     //  getProfilePicForComments = ;
+  //     print(snapshot.toString());
+
+  //     setState(() {
+  //       //isLoading = false;
+  //       // print(getSenderPostCommentDocId);
+  //       // print(getProfilePicForComments);
+  //     });
+  //   }
+  // }
+
   Future<void> chooseImage(type, BuildContext context) async {
     // ignore: prefer_typing_uninitialized_variables
     var image;
@@ -72,13 +123,13 @@ class _MySettingsState extends State<MySettings> {
       // ignore: prefer_equal_for_default_values
       // Navigator.of(context).pop();
       image = await ImagePicker()
-          .pickImage(source: ImageSource.gallery, imageQuality: 20);
+          .pickImage(source: ImageSource.gallery, imageQuality: 10);
       // Navigator.of(context).pop();
     } else if (type == "Camera") {
       // ignore: prefer_equal_for_default_values
       // Navigator.of(context).pop();
       image = await ImagePicker()
-          .pickImage(source: ImageSource.camera, imageQuality: 20);
+          .pickImage(source: ImageSource.camera, imageQuality: 10);
       // Navigator.of(context).pop();
     }
     if (image != null) {
@@ -97,7 +148,10 @@ class _MySettingsState extends State<MySettings> {
     // TODO: implement initState
     super.initState();
     getUserDetails();
+    getSenderPostId();
+    //getSenderPostCommentDetail();
     print(selectedImage);
+    print(userNameAssignController);
   }
 
   @override
@@ -238,6 +292,7 @@ class _MySettingsState extends State<MySettings> {
                   ),
                   child: TextButton(
                     onPressed: () async {
+                    //  print(' image $getProfilePicForComments');
                       if (userNameController.text.trim().isNotEmpty &&
                           fullNameController.text.trim().isNotEmpty &&
                           profileBioController.text.trim().isNotEmpty) {
@@ -251,6 +306,7 @@ class _MySettingsState extends State<MySettings> {
                             userNameController,
                             fullNameController,
                             profileBioController,
+                            getSenderPostDocId,
                           );
                         } else {
                           await updateUserProfileData(
@@ -258,7 +314,8 @@ class _MySettingsState extends State<MySettings> {
                               selectedImage,
                               userNameController,
                               fullNameController,
-                              profileBioController);
+                              profileBioController,
+                              getSenderPostDocId);
                         }
                       } else {
                         DisplayFlutterToast('Your fields are empty', context);

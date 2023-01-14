@@ -15,6 +15,7 @@ updateUserProfileData(
   TextEditingController userNameController,
   TextEditingController fullNameController,
   TextEditingController profileBioController,
+  String getSenderPostId,
 ) async {
   showDialog(
       context: context,
@@ -36,6 +37,22 @@ updateUserProfileData(
   imageurl = await ref.getDownloadURL();
 
   try {
+    FirebaseFirestore.instance
+        .collection('your_cherps')
+        .doc(getSenderPostId)
+        .update({
+      'senderUserName': userNameController.text.trim(),
+      'senderUserImg': imageurl,
+    });
+    FirebaseFirestore.instance
+        .collection('your_cherps')
+        .doc(getSenderPostId)
+        .collection('comments')
+        .doc()
+        .update({
+      'senderUserName': userNameController.text.trim(),
+      'senderUserImg': imageurl,
+    });
     users.doc(user?.uid).update({
       'userImg': imageurl,
       'userName': userNameController.text.trim(),
@@ -44,6 +61,9 @@ updateUserProfileData(
     }).then((value) {
       Navigator.pop(context);
       DisplayFlutterToast("Data has been updated..", context);
+      userNameController.clear();
+      fullNameController.clear();
+      profileBioController.clear();
     }).catchError((error) {
       DisplayFlutterToast("Failed to update user: $error", context);
     });
@@ -57,6 +77,7 @@ updateOnlyFields(
   TextEditingController userNameController,
   TextEditingController fullNameController,
   TextEditingController profileBioController,
+  String getSenderPostId,
 ) {
   showDialog(
       context: context,
@@ -71,13 +92,22 @@ updateOnlyFields(
   final ref = FirebaseStorage.instance;
 
   try {
+    FirebaseFirestore.instance
+        .collection('your_cherps')
+        .doc(getSenderPostId)
+        .update({
+      'senderUserName': userNameController.text.trim(),
+    });
     users.doc(user?.uid).update({
       'userName': userNameController.text.trim(),
       'userProfileBio': profileBioController.text.trim(),
-      'fullName': userNameController.text.trim(),
+      'fullName': fullNameController.text.trim(),
     }).then((value) {
       Navigator.pop(context);
       DisplayFlutterToast("Data has been updated..", context);
+      userNameController.clear();
+      fullNameController.clear();
+      profileBioController.clear();
     }).catchError((error) {
       DisplayFlutterToast("Failed to update user: $error", context);
     });

@@ -91,11 +91,11 @@ class _TweetsState extends State<Tweets> {
   String? senderUserName;
   String? senderUserId;
   String? senderUserNumber;
-  String? senderUserImg;
+  String senderUserImg = '';
   String? targetUserName;
   String? targetUserId;
   String? targetUserNumber;
-  String? targetUserImg;
+  String targetUserImg = '';
   String? cherpDesc;
   String? postImg;
   int? cherpLikes;
@@ -170,6 +170,8 @@ class _TweetsState extends State<Tweets> {
                     cherpLikeUserList,
                     totalComments,
                     targetUserName,
+                    senderUserImg,
+                    targetUserImg,
                   );
                 });
           }
@@ -190,11 +192,11 @@ class _SearchTweetsState extends State<SearchTweets> {
   String? senderUserName;
   String? senderUserId;
   String? senderUserNumber;
-  String? senderUserImg;
+  String senderUserImg = '';
   String? targetUserName;
   String? targetUserId;
   String? targetUserNumber;
-  String? targetUserImg;
+  String targetUserImg = '';
   String? cherpDesc;
   String? postImg;
   int? cherpLikes;
@@ -279,6 +281,8 @@ class _SearchTweetsState extends State<SearchTweets> {
                         cherpLikeUserList,
                         totalComments,
                         targetUserName,
+                        senderUserImg,
+                        targetUserImg,
                       );
                     });
               }

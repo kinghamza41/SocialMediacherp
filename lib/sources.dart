@@ -121,10 +121,19 @@ class TheCard extends StatefulWidget {
   String? documentId;
   List? cherpLikeUserList;
   int? totalcomments;
+  String senderUserImg = '';
+  String targetUserImg = '';
 
   String? targetUserName;
-  TheCard(this.senderUserName, this.cherpLikes, this.documentId,
-      this.cherpLikeUserList, this.totalcomments, this.targetUserName,
+  TheCard(
+      this.senderUserName,
+      this.cherpLikes,
+      this.documentId,
+      this.cherpLikeUserList,
+      this.totalcomments,
+      this.targetUserName,
+      this.senderUserImg,
+      this.targetUserImg,
       // this.cherpLikeUserList,
       {Key? key})
       : super(key: key);
@@ -136,6 +145,8 @@ class TheCard extends StatefulWidget {
 class _TheCardState extends State<TheCard> {
   User? user;
   bool? isLiked = false;
+  bool isLoading = true;
+  String senderImage = '';
   // List cherpUserList = [];
   @override
   void initState() {
@@ -145,6 +156,8 @@ class _TheCardState extends State<TheCard> {
     // print(senderUserName);
     user = FirebaseAuth.instance.currentUser;
     print("the card  ${widget.cherpLikeUserList.toString()}");
+    senderImage = widget.senderUserImg.toString();
+    isLoading = false;
     // cherpUserList = widget.cherpLikeUserList!;
     // print("val $cherpUserList");
 // user =FirebaseAuth.instance.currentUser;
@@ -172,7 +185,7 @@ class _TheCardState extends State<TheCard> {
                       ),
                     ),
                     child: CircleAvatar(
-                      backgroundImage: AssetImage(path),
+                      backgroundImage: NetworkImage(path, scale: 1.0),
                       radius: 25,
                     ),
                   ),
@@ -210,7 +223,9 @@ class _TheCardState extends State<TheCard> {
           Row(
             children: [
               getAvatar(
-                  path: sources.avatar_01,
+                  path: widget.senderUserImg == null
+                      ? sources.avatar_02
+                      : widget.senderUserImg,
                   name: widget.senderUserName.toString()),
               const Padding(
                 padding: EdgeInsets.all(8.0),
@@ -218,7 +233,9 @@ class _TheCardState extends State<TheCard> {
                     color: Colors.yellow),
               ), // Arrow
               getAvatar(
-                  path: sources.avatar_02,
+                  path: widget.targetUserImg == null
+                      ? sources.avatar_02
+                      : widget.targetUserImg,
                   name: widget.targetUserName.toString()),
             ],
           ), // Avatars
@@ -226,6 +243,7 @@ class _TheCardState extends State<TheCard> {
             "Here is the sample text, which is going to be replaced with the actual "
             "tweet. This is just a placeholder for now. I am going to further design "
             "the application.",
+            // widget.senderUserImg.toString(),
             style: sources.font_style(
               color: sources.color_TheOther.withOpacity(0.8),
               fontSize: 15,
@@ -334,196 +352,196 @@ class _TheCardState extends State<TheCard> {
   }
 }
 
-class SearchCard extends StatefulWidget {
-  String? senderUserName;
-  int cherpLikes;
-  String? documentId;
-  List? cherpLikeUserList;
-  int? totalcomments;
-  String? cherpDesc;
-  String? targetUserName;
-  SearchCard(
-      this.senderUserName,
-      this.cherpLikes,
-      this.documentId,
-      this.cherpLikeUserList,
-      this.totalcomments,
-      this.targetUserName,
-      this.cherpDesc,
-      // this.cherpLikeUserList,
-      {Key? key})
-      : super(key: key);
+// class SearchCard extends StatefulWidget {
+//   String? senderUserName;
+//   int cherpLikes;
+//   String? documentId;
+//   List? cherpLikeUserList;
+//   int? totalcomments;
+//   String? cherpDesc;
+//   String? targetUserName;
+//   SearchCard(
+//       this.senderUserName,
+//       this.cherpLikes,
+//       this.documentId,
+//       this.cherpLikeUserList,
+//       this.totalcomments,
+//       this.targetUserName,
+//       this.cherpDesc,
+//       // this.cherpLikeUserList,
+//       {Key? key})
+//       : super(key: key);
 
-  @override
-  State<SearchCard> createState() => _SearchCardState();
-}
+//   @override
+//   State<SearchCard> createState() => _SearchCardState();
+// }
 
-class _SearchCardState extends State<SearchCard> {
-  User? user;
-  bool? isLiked = false;
-  // List cherpUserList = [];
-  @override
-  void initState() {
-    // ignore: todo
-    // TODO: implement initState
-    super.initState();
-    // print(senderUserName);
-    user = FirebaseAuth.instance.currentUser;
-    print("the card  ${widget.cherpLikeUserList.toString()}");
-    // cherpUserList = widget.cherpLikeUserList!;
-    // print("val $cherpUserList");
-// user =FirebaseAuth.instance.currentUser;
-    print(user);
-  }
+// class _SearchCardState extends State<SearchCard> {
+//   User? user;
+//   bool? isLiked = false;
+//   // List cherpUserList = [];
+//   @override
+//   void initState() {
+//     // ignore: todo
+//     // TODO: implement initState
+//     super.initState();
+//     // print(senderUserName);
+//     user = FirebaseAuth.instance.currentUser;
+//     print("the card  ${widget.cherpLikeUserList.toString()}");
+//     // cherpUserList = widget.cherpLikeUserList!;
+//     // print("val $cherpUserList");
+// // user =FirebaseAuth.instance.currentUser;
+//     print(user);
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    Widget getAvatar({
-      required String path,
-      required String name,
-    }) =>
-        Expanded(
-          child: Row(
-            children: [
-              Flexible(
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 2,
-                      ),
-                    ),
-                    child: CircleAvatar(
-                      backgroundImage: AssetImage(path),
-                      radius: 25,
-                    ),
-                  ),
-                ),
-              ),
-              Text(
-                // widget.senderUserName.toString(),
-                name,
-                style: sources.font_style(
-                  color: sources.color_TheOther,
-                  fontSize: MediaQuery.of(context).size.width * 0.04,
-                ),
-              )
-            ],
-          ),
-        );
+//   @override
+//   Widget build(BuildContext context) {
+//     Widget getAvatar({
+//       required String path,
+//       required String name,
+//     }) =>
+//         Expanded(
+//           child: Row(
+//             children: [
+//               Flexible(
+//                 child: Padding(
+//                   padding: const EdgeInsets.all(10.0),
+//                   child: Container(
+//                     decoration: BoxDecoration(
+//                       shape: BoxShape.circle,
+//                       border: Border.all(
+//                         color: Colors.white,
+//                         width: 2,
+//                       ),
+//                     ),
+//                     child: CircleAvatar(
+//                       backgroundImage: AssetImage(path),
+//                       radius: 25,
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//               Text(
+//                 // widget.senderUserName.toString(),
+//                 name,
+//                 style: sources.font_style(
+//                   color: sources.color_TheOther,
+//                   fontSize: MediaQuery.of(context).size.width * 0.04,
+//                 ),
+//               )
+//             ],
+//           ),
+//         );
 
-    return Container(
-      decoration: BoxDecoration(
-        color: sources.is_dark
-            ? sources.color_dark.withOpacity(0.2)
-            : sources.color_light,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      margin: EdgeInsets.symmetric(
-        vertical: MediaQuery.of(context).size.height * 0.02,
-      ),
-      padding: EdgeInsets.symmetric(
-        horizontal: MediaQuery.of(context).size.width * 0.05,
-        vertical: MediaQuery.of(context).size.height * 0.025,
-      ),
-      width: double.infinity,
-      child: Column(
-        children: [
-          Row(
-            children: [
-              getAvatar(
-                  path: sources.avatar_01,
-                  name: widget.senderUserName.toString()),
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Icon(Icons.arrow_circle_right_rounded,
-                    color: Colors.yellow),
-              ), // Arrow
-              getAvatar(
-                  path: sources.avatar_02,
-                  name: widget.targetUserName.toString()),
-            ],
-          ), // Avatars
-          Text(
-            "Here is the sample text, which is going to be replaced with the actual "
-            "tweet. This is just a placeholder for now. I am going to further design "
-            "the application.",
-            style: sources.font_style(
-              color: sources.color_TheOther.withOpacity(0.8),
-              fontSize: 15,
-              height: 1.5,
-            ),
-          ),
-          //  // Text
-          // Text(
-          //   "Data",
-          //   style: TextStyle(fontSize: 20, color: Colors.white),
-          // ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.asset(sources.image_01,
-                  width: double.infinity, height: 200, fit: BoxFit.cover),
-            ),
-          ), // Image
-          Row(
-            // mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // mainAxisAlignment: MainAxisAlignment.spaceAround,
-              Container(
-                // color: Colors.amber,
-                child: Row(
-                  children: [
-                    widget.cherpLikeUserList!.contains(user!.uid)
-                        ? Icon(Icons.favorite, color: Colors.red)
-                        : Icon(Icons.favorite_border, color: Colors.white),
-                    const SizedBox(width: 5),
-                    Text(
-                      Numeral(widget.cherpLikes).format().toString(),
-                      style: sources.font_style(
-                        color: Colors.white,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+//     return Container(
+//       decoration: BoxDecoration(
+//         color: sources.is_dark
+//             ? sources.color_dark.withOpacity(0.2)
+//             : sources.color_light,
+//         borderRadius: BorderRadius.circular(10),
+//       ),
+//       margin: EdgeInsets.symmetric(
+//         vertical: MediaQuery.of(context).size.height * 0.02,
+//       ),
+//       padding: EdgeInsets.symmetric(
+//         horizontal: MediaQuery.of(context).size.width * 0.05,
+//         vertical: MediaQuery.of(context).size.height * 0.025,
+//       ),
+//       width: double.infinity,
+//       child: Column(
+//         children: [
+//           Row(
+//             children: [
+//               getAvatar(
+//                   path: sources.avatar_01,
+//                   name: widget.senderUserName.toString()),
+//               const Padding(
+//                 padding: EdgeInsets.all(8.0),
+//                 child: Icon(Icons.arrow_circle_right_rounded,
+//                     color: Colors.yellow),
+//               ), // Arrow
+//               getAvatar(
+//                   path: sources.avatar_02,
+//                   name: widget.targetUserName.toString()),
+//             ],
+//           ), // Avatars
+//           Text(
+//             "Here is the sample text, which is going to be replaced with the actual "
+//             "tweet. This is just a placeholder for now. I am going to further design "
+//             "the application.",
+//             style: sources.font_style(
+//               color: sources.color_TheOther.withOpacity(0.8),
+//               fontSize: 15,
+//               height: 1.5,
+//             ),
+//           ),
+//           //  // Text
+//           // Text(
+//           //   "Data",
+//           //   style: TextStyle(fontSize: 20, color: Colors.white),
+//           // ),
+//           Padding(
+//             padding: const EdgeInsets.symmetric(vertical: 20),
+//             child: ClipRRect(
+//               borderRadius: BorderRadius.circular(10),
+//               child: Image.asset(sources.image_01,
+//                   width: double.infinity, height: 200, fit: BoxFit.cover),
+//             ),
+//           ), // Image
+//           Row(
+//             // mainAxisAlignment: MainAxisAlignment.center,
+//             children: [
+//               // mainAxisAlignment: MainAxisAlignment.spaceAround,
+//               Container(
+//                 // color: Colors.amber,
+//                 child: Row(
+//                   children: [
+//                     widget.cherpLikeUserList!.contains(user!.uid)
+//                         ? Icon(Icons.favorite, color: Colors.red)
+//                         : Icon(Icons.favorite_border, color: Colors.white),
+//                     const SizedBox(width: 5),
+//                     Text(
+//                       Numeral(widget.cherpLikes).format().toString(),
+//                       style: sources.font_style(
+//                         color: Colors.white,
+//                         fontSize: 15,
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
 
-              const SizedBox(width: 30),
-              Container(
-                // color: Colors.blue,
-                child: Row(
-                  children: [
-                    Icon(Icons.comment, color: Colors.white),
-                    const SizedBox(width: 5),
-                    widget.totalcomments == 0
-                        ? Text('')
-                        : Text(
-                            Numeral(int.parse(widget.totalcomments.toString()))
-                                .format()
-                                .toString(),
-                            style: sources.font_style(
-                              color: sources.color_TheOther,
-                              fontSize: 15,
-                            ),
-                          ),
-                  ],
-                ),
-              ),
+//               const SizedBox(width: 30),
+//               Container(
+//                 // color: Colors.blue,
+//                 child: Row(
+//                   children: [
+//                     Icon(Icons.comment, color: Colors.white),
+//                     const SizedBox(width: 5),
+//                     widget.totalcomments == 0
+//                         ? Text('')
+//                         : Text(
+//                             Numeral(int.parse(widget.totalcomments.toString()))
+//                                 .format()
+//                                 .toString(),
+//                             style: sources.font_style(
+//                               color: sources.color_TheOther,
+//                               fontSize: 15,
+//                             ),
+//                           ),
+//                   ],
+//                 ),
+//               ),
 
-              SizedBox(width: 10),
-              // Icon(Icons.message_rounded, color: sources.color_TheOther),
+//               SizedBox(width: 10),
+//               // Icon(Icons.message_rounded, color: sources.color_TheOther),
 
-              // Icons
-              // const Icon(Icons.share, color: Colors.white),
-            ],
-          ), // Icons
-        ],
-      ),
-    );
-  }
-}
+//               // Icons
+//               // const Icon(Icons.share, color: Colors.white),
+//             ],
+//           ), // Icons
+//         ],
+//       ),
+//     );
+//   }
+// }

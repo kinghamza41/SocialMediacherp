@@ -51,31 +51,12 @@ class _CommentsReplyScreenState extends State<CommentsReplyScreen> {
     }
   }
 
-  Future<void> getCherpDetails(String? getPostDocumentId) async {
-    if (user != null) {
-      //  await FirebaseFirestore.instance.collection("users").get();
-      final snapshot = await FirebaseFirestore.instance
-          .collection("your_cherps")
-          .where('postId', isEqualTo: getPostDocumentId)
-          .get();
-      postId = snapshot.docs.first['postId'];
-      // userId = snapshot.docs.first['userId'];
-      // userNumber = snapshot.docs.first['phoneNumber'];
-      // userImg = snapshot.docs.first['userImg'];
-
-      setState(() {
-        isLoading = false;
-        print(' post id  $postId');
-      });
-    }
-  }
-
   @override
   void initState() {
     // ignore: todo
     // TODO: implement initState
     super.initState();
-    // getSenderUserDetails();
+    getSenderUserDetails();
     // print(postId);
     getPostCommentId = Get.arguments['commentId'];
     getPostId = Get.arguments['postId'];
@@ -176,26 +157,29 @@ class _CommentsReplyScreenState extends State<CommentsReplyScreen> {
                 ),
                 InkWell(
                   onTap: (() async {
-                    String commentId = Uuid().v4();
+                    String commentReplyId = Uuid().v4();
 
                     try {
                       if (commentDescController.text.isNotEmpty) {
-                        // await FirebaseFirestore.instance
-                        //     .collection("your_cherps")
-                        //     .doc(getPostDocumentId)
-                        //     .collection("comments")
-                        //     .doc(commentId)
-                        //     .set({
-                        //   "profilePic": userImg,
-                        //   'name': userName,
-                        //   'uid': userId,
-                        //   'text': commentDescController.text.toString(),
-                        //   'datePublished': DateTime.now(),
-                        //   'postId': postId,
-                        //   'commentId': commentId,
-                        // }).then(
-                        //   (value) => commentDescController.clear(),
-                        // );
+                        await FirebaseFirestore.instance
+                            .collection("your_cherps")
+                            .doc(getPostId)
+                            .collection("comments")
+                            .doc(getPostCommentId)
+                            .collection('replies')
+                            .doc(commentReplyId)
+                            .set({
+                          "profilePic": userImg,
+                          'name': userName,
+                          'uid': userId,
+                          'replyText': commentDescController.text.toString(),
+                          'datePublished': DateTime.now(),
+                          'postId': getPostId,
+                          'replyId': commentReplyId,
+                          'commentId': getPostCommentId,
+                        }).then(
+                          (value) => commentDescController.clear(),
+                        );
 
                         // await FirebaseFirestore.instance
                         //     .collection("your_cherps")

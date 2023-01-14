@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable, prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: must_be_immutable, prefer_const_constructors, prefer_const_literals_to_create_immutables, avoid_unnecessary_containers
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,9 +25,9 @@ class ProgressDialog extends StatelessWidget {
               height: 6.0,
             ),
             Container(
-              decoration: BoxDecoration(
-                  gradient:
-                      LinearGradient(colors: [Colors.black, Colors.blue])),
+              // decoration: BoxDecoration(
+              //     gradient:
+              //         LinearGradient(colors: [Colors.black, Colors.blue])),
               child: CupertinoActivityIndicator(
                 radius: 20.0,
                 // color: ,
