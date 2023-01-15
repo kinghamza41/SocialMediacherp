@@ -149,7 +149,7 @@ class _Sign_inState extends State<Sign_in> {
                         });
                         Navigator.pop(context);
 
-                        Get.off(() => OTP_verification(), arguments: {
+                        Get.to(() => OTP_verification(), arguments: {
                           "id": id,
                           'phoneNumber': phone,
                         });

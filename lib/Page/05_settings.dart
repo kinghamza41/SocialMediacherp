@@ -35,9 +35,9 @@ class _MySettingsState extends State<MySettings> {
   TextEditingController profileBioAssignController = TextEditingController();
 
   User? user = FirebaseAuth.instance.currentUser;
-  dynamic userName;
+  String userName = '';
   dynamic userId;
-  String? userImg;
+  String userImg = '';
   String fullName = '';
   String userProfileBio = '';
   // File? profileImage;
@@ -59,16 +59,18 @@ class _MySettingsState extends State<MySettings> {
             isEqualTo: user!.uid,
           )
           .get();
-      userName = snapshot.docs.first['userName'];
-      userId = snapshot.docs.first['userId'];
-      userImg = snapshot.docs.first['userImg'];
-      fullName = snapshot.docs.first['fullName'];
-      userProfileBio = snapshot.docs.first['userProfileBio'];
+      if (snapshot.docs.isNotEmpty) {
+        userName = snapshot.docs.first['userName'];
+        userId = snapshot.docs.first['userId'];
+        userImg = snapshot.docs.first['userImg'];
+        fullName = snapshot.docs.first['fullName'];
+        userProfileBio = snapshot.docs.first['userProfileBio'];
 
-      setState(() {
-        isLoading = false;
-        print(userId);
-      });
+        setState(() {
+          isLoading = false;
+          print(userId);
+        });
+      }
     }
   }
 
@@ -82,16 +84,18 @@ class _MySettingsState extends State<MySettings> {
             isEqualTo: user!.uid,
           )
           .get();
+      if (snapshot.docs.isNotEmpty) {
+        getSenderPostDocId = snapshot.docs.first['postId'];
 
-      getSenderPostDocId = snapshot.docs.first['postId'];
-      // if (getSenderPostDocId != null) {
-      //   getSenderPostCommentDetail(getSenderPostDocId);
-      // }
+        // if (getSenderPostDocId != null) {
+        //   getSenderPostCommentDetail(getSenderPostDocId);
+        // }
 
-      setState(() {
-        //isLoading = false;
-        print(getSenderPostDocId);
-      });
+        setState(() {
+          //isLoading = false;
+          print(getSenderPostDocId);
+        });
+      }
     }
   }
 
@@ -150,7 +154,7 @@ class _MySettingsState extends State<MySettings> {
     getUserDetails();
     getSenderPostId();
     //getSenderPostCommentDetail();
-    print(selectedImage);
+    //print(selectedImage);
     print(userNameAssignController);
   }
 
@@ -160,179 +164,184 @@ class _MySettingsState extends State<MySettings> {
       height: MediaQuery.of(context).size.height * 0.02,
     );
 
-    return isLoading
-        ? Center(
-            child: CupertinoActivityIndicator(),
-          )
-        : DarkOne(
-            child: ListView(
-              padding: EdgeInsets.only(
-                top: MediaQuery.of(context).size.height * 0.1,
-                left: MediaQuery.of(context).size.width * 0.05,
-                right: MediaQuery.of(context).size.width * 0.05,
-                bottom: MediaQuery.of(context).size.height * 0.1,
+    return DarkOne(
+      child: ListView(
+        padding: EdgeInsets.only(
+          top: MediaQuery.of(context).size.height * 0.1,
+          left: MediaQuery.of(context).size.width * 0.05,
+          right: MediaQuery.of(context).size.width * 0.05,
+          bottom: MediaQuery.of(context).size.height * 0.1,
+        ),
+        children: [
+          // MyAvatar(),
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white,
+                width: 2,
               ),
-              children: [
-                // MyAvatar(),
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 2,
-                    ),
-                  ),
-                  child: GestureDetector(
-                    onTap: () async {
-                      PermissionStatus galleryPermission =
-                          await Permission.storage.request();
-                      print(galleryPermission);
+            ),
+            child: GestureDetector(
+              onTap: () async {
+                PermissionStatus galleryPermission =
+                    await Permission.storage.request();
+                print(galleryPermission);
 
-                      if (galleryPermission == PermissionStatus.granted) {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text("Pick Image:"),
-                              actions: [
-                                ListTile(
-                                  leading: const Icon(Icons.camera),
-                                  title: const Text('Camera'),
-                                  onTap: () {
-                                    // chooseImage("camera");
-                                    Navigator.pop(context);
+                if (galleryPermission == PermissionStatus.granted) {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text("Pick Image:"),
+                        actions: [
+                          ListTile(
+                            leading: const Icon(Icons.camera),
+                            title: const Text('Camera'),
+                            onTap: () {
+                              // chooseImage("camera");
+                              Navigator.pop(context);
 
-                                    // selectImages("camera");
-                                    chooseImage("Camera", context);
-                                  },
-                                ),
-                                ListTile(
-                                  leading: const Icon(Icons.photo),
-                                  title: const Text('Gallery'),
-                                  onTap: () {
-                                    Navigator.pop(context);
+                              // selectImages("camera");
+                              chooseImage("Camera", context);
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.photo),
+                            title: const Text('Gallery'),
+                            onTap: () {
+                              Navigator.pop(context);
 
-                                    chooseImage("Gallery", context);
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      }
-                      if (galleryPermission == PermissionStatus.denied) {
-                        DisplayFlutterToast("Please Allow Permission", context);
-                      }
-                      if (galleryPermission ==
-                          PermissionStatus.permanentlyDenied) {
-                        DisplayFlutterToast(
-                            "Please Allow Permission For Further Usage",
-                            context);
-                        openAppSettings();
-                      }
+                              chooseImage("Gallery", context);
+                            },
+                          ),
+                        ],
+                      );
                     },
-                    child: CircleAvatar(
-                      // backgroundImage: ,
-                      backgroundColor: Colors.transparent,
+                  );
+                }
+                if (galleryPermission == PermissionStatus.denied) {
+                  DisplayFlutterToast("Please Allow Permission", context);
+                }
+                if (galleryPermission == PermissionStatus.permanentlyDenied) {
+                  DisplayFlutterToast(
+                      "Please Allow Permission For Further Usage", context);
+                  openAppSettings();
+                }
+              },
+              child: CircleAvatar(
+                  // backgroundImage: ,
+                  backgroundColor: Colors.transparent,
 
 // MediaQuery.of(context).size.width * widget.aspect
-                      // foregroundImage: const AssetImage("assets/Placeholder/P2.png"),
-                      radius: 60,
-                      child: ClipOval(
-                        child: selectedImage != null
-                            ? Image.file(
-                                selectedImage!,
-                                fit: BoxFit.fill,
-                                // height: 10.h,
-                                // width: 30.w,
-                              )
-                            : CachedNetworkImage(
-                                // width: 12.w,
-                                // height: 6.h,
-                                fit: BoxFit.fitHeight,
-                                placeholder: (context, url) => ColoredBox(
-                                  color: Colors.transparent,
-                                  child: Center(
-                                    child: CupertinoActivityIndicator(
-                                      color: Colors.amber,
+                  // foregroundImage: const AssetImage("assets/Placeholder/P2.png"),
+                  radius: 60,
+                  child: ClipOval(
+                      child: selectedImage != null
+                          ? Image.file(
+                              selectedImage!,
+                              fit: BoxFit.fill,
+                              // height: 10.h,
+                              // width: 30.w,
+                            )
+                          : userImg == ''
+                              ? Container()
+                              : CachedNetworkImage(
+                                  // width: 12.w,
+                                  // height: 6.h,
+                                  fit: BoxFit.fitHeight,
+                                  placeholder: (context, url) => ColoredBox(
+                                    color: Colors.transparent,
+                                    child: Center(
+                                      child: CupertinoActivityIndicator(
+                                        color: Colors.amber,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                imageUrl: '$userImg',
-                              ),
-                      ),
-                    ),
+                                  imageUrl: userImg,
+                                )
+                      // : Image.asset('assets/Placeholder/P2.png'),
+                      )
+                  // : ClipOval(child: CachedNetworkImage(imageUrl: userImg)),
                   ),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-                text_field(context, userName == null ? "Username" : userName,
-                    userNameController),
-                my_spacing,
-                text_field(context, fullName == null ? "Full Name" : fullName,
-                    fullNameController),
-                my_spacing,
-                text_field(
-                    context,
-                    userProfileBio == null ? "Profile Bio" : userProfileBio,
-                    profileBioController),
-                my_spacing,
-                GestureDetector(
-                  onTap: () async {
-                    if (userNameController.text.trim().isNotEmpty &&
-                        fullNameController.text.trim().isNotEmpty &&
-                        profileBioController.text.trim().isNotEmpty) {
-                      if (selectedImage == null &&
-                          userNameController.text.trim() != userName &&
-                          fullNameController.text.trim() != fullName &&
-                          profileBioController.text.trim() != userProfileBio) {
-                        await updateOnlyFields(
-                          context,
-                          userNameController,
-                          fullNameController,
-                          profileBioController,
-                          getSenderPostDocId,
-                        );
-                      } else {
-                        await updateUserProfileData(
-                            context,
-                            selectedImage,
-                            userNameController,
-                            fullNameController,
-                            profileBioController,
-                            getSenderPostDocId);
-                      }
-                    } else {
-                      DisplayFlutterToast('Your fields are empty', context);
-                    }
-                    print(userId);
-
-                    print("profile image ${selectedImage.toString()}");
-                  },
-                  child: Container(
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: Colors.yellow,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: MediaQuery.of(context).size.width * 0.05,
-                      vertical: MediaQuery.of(context).size.height * 0.02,
-                    ),
-                    margin: EdgeInsets.symmetric(
-                      vertical: MediaQuery.of(context).size.height * 0.02,
-                      horizontal: MediaQuery.of(context).size.width * 0.07,
-                    ),
-                    child: Text(
-                      "Save",
-                      style: sources.font_style(
-                        color: Colors.black,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
             ),
-          );
+          ),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+          text_field(
+              context,
+              userName.toString().isEmpty ? "Username" : userName,
+              userNameController),
+          my_spacing,
+          text_field(
+              context,
+              fullName.toString().isEmpty ? "Full Name" : fullName,
+              fullNameController),
+          my_spacing,
+          text_field(
+              context,
+              userProfileBio.toString().isEmpty
+                  ? "Profile Bio"
+                  : userProfileBio,
+              profileBioController),
+          my_spacing,
+          GestureDetector(
+            onTap: () async {
+              if (userNameController.text.trim().isNotEmpty &&
+                  fullNameController.text.trim().isNotEmpty &&
+                  profileBioController.text.trim().isNotEmpty) {
+                if (selectedImage == null &&
+                    userImg == '' &&
+                    userNameController.text.trim() != userName &&
+                    fullNameController.text.trim() != fullName &&
+                    profileBioController.text.trim() != userProfileBio) {
+                  await updateOnlyFields(
+                    context,
+                    userNameController,
+                    fullNameController,
+                    profileBioController,
+                    getSenderPostDocId,
+                  );
+                } else {
+                  await updateUserProfileData(
+                      context,
+                      selectedImage,
+                      userNameController,
+                      fullNameController,
+                      profileBioController,
+                      getSenderPostDocId);
+                }
+              } else {
+                DisplayFlutterToast('Your fields are empty', context);
+              }
+              print(userId);
+
+              print("profile image ${selectedImage.toString()}");
+            },
+            child: Container(
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: Colors.yellow,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.05,
+                vertical: MediaQuery.of(context).size.height * 0.02,
+              ),
+              margin: EdgeInsets.symmetric(
+                vertical: MediaQuery.of(context).size.height * 0.02,
+                horizontal: MediaQuery.of(context).size.width * 0.07,
+              ),
+              child: Text(
+                "Save",
+                style: sources.font_style(
+                  color: Colors.black,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

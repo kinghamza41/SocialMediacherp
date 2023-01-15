@@ -13,6 +13,8 @@ import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:pinput/pinput.dart';
 
+import '../widget/progress_dialog.dart';
+
 class OTP_verification extends StatefulWidget {
   const OTP_verification({super.key});
 
@@ -42,8 +44,10 @@ class _OTP_verificationState extends State<OTP_verification> {
     // ignore: todo
     // TODO: implement initState
     super.initState();
-
-    phone = Get.arguments['phoneNumber'];
+    if (Get.arguments != null) {
+      phone = Get.arguments['phoneNumber'];
+      verfiyId = Get.arguments["id"];
+    }
     print(phone);
   }
 
@@ -193,7 +197,39 @@ class _OTP_verificationState extends State<OTP_verification> {
               height: screen_height / 70,
             ),
             GestureDetector(
-              onTap: () {},
+              onTap: () async {
+                // showDialog(
+                //     context: context,
+                //     barrierDismissible: false,
+                //     builder: (BuildContext context) {
+                //       return ProgressDialog(
+                //         message: "Please Wait..",
+                //       );
+                //     });
+                await FirebaseAuth.instance.verifyPhoneNumber(
+                  phoneNumber: phone,
+                  verificationCompleted: (PhoneAuthCredential credential) {},
+                  verificationFailed: (FirebaseAuthException e) {},
+                  codeSent: (String verificationId, int? resendToken) {
+                    setState(() {
+                      verfiyId = verificationId;
+                      //  print("Verf id $id");
+                    });
+                    // Navigator.pop(context);
+
+                    // Get.off(() => OTP_verification(), arguments: {
+                    //   "id": id,
+                    //   'phoneNumber': phone,
+                    // });
+                  },
+                  codeAutoRetrievalTimeout: (String verId) {
+                    // Sign_in.verify = verId;
+                    // setState(() {
+                    //   authStatus = "TIMEOUT";
+                    // });
+                  },
+                );
+              },
               child: Center(
                 child: Text.rich(TextSpan(
                     text: "Didn't receive the code? ",
@@ -225,6 +261,14 @@ class _OTP_verificationState extends State<OTP_verification> {
                     // print(Get.arguments["id"]);
                     verfiyId = Get.arguments["id"];
                     try {
+                      showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return ProgressDialog(
+                              message: "Please Wait..",
+                            );
+                          });
                       final AuthCredential credential =
                           PhoneAuthProvider.credential(
                         verificationId: Get.arguments["id"],
@@ -250,6 +294,8 @@ class _OTP_verificationState extends State<OTP_verification> {
                           'email': "",
                           'phoneNumber': phone,
                           'userImg': "",
+                          'fullName': "",
+                          'userProfileBio': "",
                           "userId": userCredential.uid,
                         }).then(
                           (value) => Get.offAll(
@@ -259,6 +305,7 @@ class _OTP_verificationState extends State<OTP_verification> {
                       }
                     } catch (e) {
                       e.printError();
+                      Navigator.pop(context);
                     }
                   },
                   child: Text(
