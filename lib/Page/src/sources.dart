@@ -59,9 +59,9 @@ Widget text_field(
 
 class MyAvatar extends StatefulWidget {
   static File? selectedImage;
-  const MyAvatar({this.aspect = 0.2, Key? key}) : super(key: key);
-
   final double aspect;
+
+  const MyAvatar({this.aspect = 0.2, Key? key}) : super(key: key);
 
   @override
   State<MyAvatar> createState() => _MyAvatarState();
@@ -74,8 +74,15 @@ class _MyAvatarState extends State<MyAvatar> {
           shape: BoxShape.circle,
           border: Border.all(
             color: Colors.white,
-            width: 2,
+
+            // According to aspect
+            width: MediaQuery.of(context).size.width * widget.aspect * 0.07,
           ),
+        ),
+        child: CircleAvatar(
+          foregroundImage: const AssetImage("assets/Placeholder/P2.png"),
+          //radius: 40,
+          radius: MediaQuery.of(context).size.width * widget.aspect,
         ),
       );
 }
@@ -172,6 +179,8 @@ class _TweetsState extends State<Tweets> {
                     targetUserName,
                     senderUserImg,
                     targetUserImg,
+                    cherpDesc!,
+                    postImg,
                   );
                 });
           }
@@ -283,6 +292,8 @@ class _SearchTweetsState extends State<SearchTweets> {
                         targetUserName,
                         senderUserImg,
                         targetUserImg,
+                        cherpDesc!,
+                        postImg,
                       );
                     });
               }

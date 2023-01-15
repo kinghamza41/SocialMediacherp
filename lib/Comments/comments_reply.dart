@@ -60,6 +60,7 @@ class _CommentsReplyScreenState extends State<CommentsReplyScreen> {
     // print(postId);
     getPostCommentId = Get.arguments['commentId'];
     getPostId = Get.arguments['postId'];
+    isLoading = false;
     //getCherpDetails(getPostDocumentId);
 
     print('postCommentId  ${Get.arguments['commentId']}');
@@ -70,9 +71,23 @@ class _CommentsReplyScreenState extends State<CommentsReplyScreen> {
   // }
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: isLoading
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/background_dark.png'
+                // sources.is_dark
+                //     ? profile
+                //         ? sources.background_profile_dark
+                //         : sources.background_dark
+                //     : profile
+                //         ? sources.background_profile_light
+                //         : sources.background_light,
+                ),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: isLoading
             ? Center(
                 child: CupertinoActivityIndicator(),
               )
@@ -101,12 +116,19 @@ class _CommentsReplyScreenState extends State<CommentsReplyScreen> {
                     );
                   }
                   if (snapshot != null && snapshot.data != null) {
-                    print(snapshot.data!.docs.length);
+                    print('length ${snapshot.data!.docs.length}');
                     totalComments = snapshot.data!.docs.length;
                     return ListView.builder(
                       itemCount: totalComments,
                       itemBuilder: (context, index) {
-                        return CommentCards(
+                        return
+                            //  Container(
+                            //   child: Text(
+                            //     'val',
+                            //     style: TextStyle(color: Colors.black),
+                            //   ),
+                            // );
+                            CommentReplyCards(
                           snap: snapshot.data!.docs[index].data(),
                         );
                       },
@@ -115,96 +137,117 @@ class _CommentsReplyScreenState extends State<CommentsReplyScreen> {
                   return Container();
                 },
               ),
-        bottomNavigationBar: SafeArea(
-          child: Container(
-            height: kToolbarHeight,
-            margin: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom),
-            padding: EdgeInsets.only(left: 16, right: 8),
-            child: Row(
-              // ignore: prefer_const_literals_to_create_immutables
-              children: [
-                CircleAvatar(
-                  // backgroundImage:  ,
-                  child: ClipOval(
-                    child: CachedNetworkImage(
-                      // width: 12.w,
-                      // height: 6.h,
-                      fit: BoxFit.fitWidth,
-                      placeholder: (context, url) => ColoredBox(
-                        color: Colors.transparent,
-                        child: Center(
-                          child: CupertinoActivityIndicator(
-                            color: Colors.amber,
-                          ),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/background_dark.png'
+                  // sources.is_dark
+                  //     ? profile
+                  //         ? sources.background_profile_dark
+                  //         : sources.background_dark
+                  //     : profile
+                  //         ? sources.background_profile_light
+                  //         : sources.background_light,
+                  ),
+              fit: BoxFit.cover,
+            ),
+          ),
+          height: kToolbarHeight,
+          margin:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding: EdgeInsets.only(left: 16, right: 8),
+          child: Row(
+            // ignore: prefer_const_literals_to_create_immutables
+            children: [
+              CircleAvatar(
+                // backgroundImage:  ,
+                child: ClipOval(
+                  child: CachedNetworkImage(
+                    // width: 12.w,
+                    // height: 6.h,
+                    fit: BoxFit.fitWidth,
+                    placeholder: (context, url) => ColoredBox(
+                      color: Colors.transparent,
+                      child: Center(
+                        child: CupertinoActivityIndicator(
+                          color: Colors.amber,
                         ),
                       ),
-                      imageUrl: '$userImg',
+                    ),
+                    imageUrl: '$userImg',
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 8),
+                  child: TextField(
+                    controller: commentDescController,
+                    decoration: InputDecoration(
+                        hintStyle: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        hintText:
+                            "Reply as ${userName == null ? 'UserName' : userName}",
+                        border: InputBorder.none),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
                 ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 16, right: 8),
-                    child: TextField(
-                      controller: commentDescController,
-                      decoration: InputDecoration(
-                          hintText:
-                              "Reply as ${userName == null ? 'UserName' : userName}",
-                          border: InputBorder.none),
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: (() async {
-                    String commentReplyId = Uuid().v4();
+              ),
+              InkWell(
+                onTap: (() async {
+                  String commentReplyId = Uuid().v4();
 
-                    try {
-                      if (commentDescController.text.isNotEmpty) {
-                        await FirebaseFirestore.instance
-                            .collection("your_cherps")
-                            .doc(getPostId)
-                            .collection("comments")
-                            .doc(getPostCommentId)
-                            .collection('replies')
-                            .doc(commentReplyId)
-                            .set({
-                          "profilePic": userImg,
-                          'name': userName,
-                          'uid': userId,
-                          'replyText': commentDescController.text.toString(),
-                          'datePublished': DateTime.now(),
-                          'postId': getPostId,
-                          'replyId': commentReplyId,
-                          'commentId': getPostCommentId,
-                        }).then(
-                          (value) => commentDescController.clear(),
-                        );
+                  try {
+                    if (commentDescController.text.isNotEmpty) {
+                      await FirebaseFirestore.instance
+                          .collection("your_cherps")
+                          .doc(getPostId)
+                          .collection("comments")
+                          .doc(getPostCommentId)
+                          .collection('replies')
+                          .doc(commentReplyId)
+                          .set({
+                        "profilePic": userImg,
+                        'name': userName,
+                        'uid': userId,
+                        'replyText': commentDescController.text.toString(),
+                        'datePublished': DateTime.now(),
+                        'postId': getPostId,
+                        'replyId': commentReplyId,
+                        'commentId': getPostCommentId,
+                      }).then(
+                        (value) => commentDescController.clear(),
+                      );
 
-                        // await FirebaseFirestore.instance
-                        //     .collection("your_cherps")
-                        //     .doc(getPostDocumentId)
-                        //     .update({
-                        //   'cherpTotalComment': totalComments,
-                        // });
-                      } else {
-                        DisplayFlutterToast("Please write comment", context);
-                      }
-                    } catch (e) {
-                      print(e.toString());
+                      // await FirebaseFirestore.instance
+                      //     .collection("your_cherps")
+                      //     .doc(getPostDocumentId)
+                      //     .update({
+                      //   'cherpTotalComment': totalComments,
+                      // });
+                    } else {
+                      DisplayFlutterToast("Please write Reply", context);
                     }
-                  }),
-                  child: Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-                    child: Text(
-                      "Post",
-                      style: TextStyle(color: Colors.blueAccent),
-                    ),
+                  } catch (e) {
+                    print(e.toString());
+                  }
+                }),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                  child: Text(
+                    "Post",
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

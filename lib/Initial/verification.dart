@@ -192,18 +192,21 @@ class _OTP_verificationState extends State<OTP_verification> {
             SizedBox(
               height: screen_height / 70,
             ),
-            Center(
-              child: Text.rich(TextSpan(
-                  text: "Didn't receive the code? ",
-                  style: TextStyle(color: Colors.grey, fontSize: 13),
-                  children: [
-                    TextSpan(
-                        text: "Resend",
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 252, 231, 42),
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold))
-                  ])),
+            GestureDetector(
+              onTap: () {},
+              child: Center(
+                child: Text.rich(TextSpan(
+                    text: "Didn't receive the code? ",
+                    style: TextStyle(color: Colors.grey, fontSize: 13),
+                    children: [
+                      TextSpan(
+                          text: "Resend",
+                          style: TextStyle(
+                              color: Color.fromARGB(255, 252, 231, 42),
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold))
+                    ])),
+              ),
             ),
             SizedBox(
               height: screen_height * 0.15,
@@ -259,7 +262,7 @@ class _OTP_verificationState extends State<OTP_verification> {
                     }
                   },
                   child: Text(
-                    "Send OTP",
+                    "Verify",
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 15,

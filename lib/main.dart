@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:cherp_app/contacts.dart';
 import 'package:cherp_app/firebase_options.dart';
+import 'package:cherp_app/sources.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ import 'Page/04_notification.dart';
 import 'Page/05_settings.dart';
 import 'Initial/Signin.dart';
 import 'Initial/verification.dart';
+import 'Page/send_cherp_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,7 +37,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   User? user;
 
-  
   @override
   void initState() {
     // ignore: todo
@@ -64,6 +65,7 @@ class _MyAppState extends State<MyApp> {
       //   "signin": (context) => Sign_in(),
       //   "verification": (context) => OTP_verification(),
       // "home": (context) => TheMain(),
+
       // },
     );
   }
@@ -73,6 +75,13 @@ class TheMain extends StatefulWidget {
   const TheMain({Key? key}) : super(key: key);
 
   static final my_controller = CarouselController();
+  static const icon_names = [
+    "globe",
+    "search",
+    "tweet",
+    "ring",
+    "account",
+  ];
 
   @override
   State<TheMain> createState() => _TheMainState();
@@ -80,56 +89,84 @@ class TheMain extends StatefulWidget {
 
 class _TheMainState extends State<TheMain> {
   int selected = 0;
+  static bool profile = false;
+  late Contact contact;
 
   @override
   Widget build(BuildContext context) {
-    Widget bottomLogo(String name, {int index = 5}) => Expanded(
+    Widget bottomLogo(String name, int index) => Expanded(
           child: IconButton(
             onPressed: () => TheMain.my_controller.animateToPage(index),
             icon: SvgPicture.asset(
               "assets/Icon/$name.svg",
-              color: index == 5
-                  ? Colors.white.withOpacity(0.1)
-                  : // Remove it later
-                  index == selected
-                      ? Colors.yellow
-                      : Colors.white.withOpacity(0.5),
-              height: MediaQuery.of(context).size.height * 0.03,
+              color: index == 2
+                  ? null
+                  : index == selected
+                      ? (sources.is_dark ? Colors.yellow : sources.color_dark)
+                      : sources.color_TheOther.withOpacity(0.5),
+              // color: index == 2
+              //     ? null
+              //     : index == selected
+              //         ? (sources.is_dark ?
+              // color: Colors.yellow,
+              //  : sources.color_dark)
+              // : sources.color_TheOther.withOpacity(0.5),
+              //height: MediaQuery.of(context).size.height * 0.03,
             ),
           ),
         );
 
-    return Scaffold(
-      bottomNavigationBar: Container(
-        color: Colors.black,
-        height: MediaQuery.of(context).size.height * 0.075,
-        child: Row(
-          children: [
-            bottomLogo("globe", index: 0),
-            bottomLogo("search", index: 1),
-            bottomLogo("main_transparent", index: 2),
-            bottomLogo("ring", index: 3),
-            bottomLogo("account", index: 4),
-          ],
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(
+            sources.is_dark
+                ? profile
+                    ? sources.background_profile_dark
+                    : sources.background_dark
+                : profile
+                    ? sources.background_profile_light
+                    : sources.background_light,
+          ),
+          fit: BoxFit.cover,
         ),
       ),
-      body: CarouselSlider(
-        carouselController: TheMain.my_controller,
-        options: CarouselOptions(
-          height: MediaQuery.of(context).size.height * 0.925,
-          viewportFraction: 1,
-          enableInfiniteScroll: false,
-          onPageChanged: (index, reason) => setState(() => selected = index),
-          scrollPhysics: const NeverScrollableScrollPhysics(),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        bottomNavigationBar: Container(
+          color: sources.color_selected,
+          height: MediaQuery.of(context).size.height * 0.075,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: List.generate(TheMain.icon_names.length,
+                (index) => bottomLogo(TheMain.icon_names[index], index)),
+          ),
         ),
-        items: const [
-          MyHomePage(),
-          MySearch(),
-          MyHomeInfo(),
-          MyNotification(),
-          MySettings(),
-        ],
+        body: CarouselSlider(
+          carouselController: TheMain.my_controller,
+          options: CarouselOptions(
+            height: MediaQuery.of(context).size.height * 0.925,
+            viewportFraction: 1,
+            enableInfiniteScroll: false,
+            onPageChanged: (index, reason) => setState(() => selected = index),
+            scrollPhysics: const NeverScrollableScrollPhysics(),
+          ),
+          items: [
+            MyHomePage(),
+            MySearch(),
+            MakeCherp(),
+            MyNotification(),
+            MySettings() //ViaEditButton(),
+            //BuyEggs(),
+          ],
+        ),
       ),
     );
   }
 }
+
+    //  MyHomePage(),
+    //       MySearch(),
+    //       MyHomeInfo(),
+    //       MyNotification(),
+    //       MySettings(),

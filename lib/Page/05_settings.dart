@@ -276,54 +276,52 @@ class _MySettingsState extends State<MySettings> {
                     userProfileBio == null ? "Profile Bio" : userProfileBio,
                     profileBioController),
                 my_spacing,
-                Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: Colors.yellow,
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.05,
-                    vertical: MediaQuery.of(context).size.height * 0.02,
-                  ),
-                  margin: EdgeInsets.symmetric(
-                    vertical: MediaQuery.of(context).size.height * 0.02,
-                    horizontal: MediaQuery.of(context).size.width * 0.07,
-                  ),
-                  child: TextButton(
-                    onPressed: () async {
-                    //  print(' image $getProfilePicForComments');
-                      if (userNameController.text.trim().isNotEmpty &&
-                          fullNameController.text.trim().isNotEmpty &&
-                          profileBioController.text.trim().isNotEmpty) {
-                        if (selectedImage == null &&
-                            userNameController.text.trim() != userName &&
-                            fullNameController.text.trim() != fullName &&
-                            profileBioController.text.trim() !=
-                                userProfileBio) {
-                          await updateOnlyFields(
+                GestureDetector(
+                  onTap: () async {
+                    if (userNameController.text.trim().isNotEmpty &&
+                        fullNameController.text.trim().isNotEmpty &&
+                        profileBioController.text.trim().isNotEmpty) {
+                      if (selectedImage == null &&
+                          userNameController.text.trim() != userName &&
+                          fullNameController.text.trim() != fullName &&
+                          profileBioController.text.trim() != userProfileBio) {
+                        await updateOnlyFields(
+                          context,
+                          userNameController,
+                          fullNameController,
+                          profileBioController,
+                          getSenderPostDocId,
+                        );
+                      } else {
+                        await updateUserProfileData(
                             context,
+                            selectedImage,
                             userNameController,
                             fullNameController,
                             profileBioController,
-                            getSenderPostDocId,
-                          );
-                        } else {
-                          await updateUserProfileData(
-                              context,
-                              selectedImage,
-                              userNameController,
-                              fullNameController,
-                              profileBioController,
-                              getSenderPostDocId);
-                        }
-                      } else {
-                        DisplayFlutterToast('Your fields are empty', context);
+                            getSenderPostDocId);
                       }
-                      print(userId);
+                    } else {
+                      DisplayFlutterToast('Your fields are empty', context);
+                    }
+                    print(userId);
 
-                      print("profile image ${selectedImage.toString()}");
-                    },
+                    print("profile image ${selectedImage.toString()}");
+                  },
+                  child: Container(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.yellow,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.05,
+                      vertical: MediaQuery.of(context).size.height * 0.02,
+                    ),
+                    margin: EdgeInsets.symmetric(
+                      vertical: MediaQuery.of(context).size.height * 0.02,
+                      horizontal: MediaQuery.of(context).size.width * 0.07,
+                    ),
                     child: Text(
                       "Save",
                       style: sources.font_style(

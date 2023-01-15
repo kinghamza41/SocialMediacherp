@@ -1,14 +1,25 @@
 // ignore_for_file: camel_case_types, constant_identifier_names, must_be_immutable, prefer_const_constructors, avoid_unnecessary_containers, avoid_print, non_constant_identifier_names
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cherp_app/Comments/comments.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:numeral/numeral.dart';
 
 class sources {
+  static var is_dark = true;
+
+  //static var is_dark = ThemeMode.system == ThemeMode.dark;
+
+  static const color_dark = Colors.black;
+  static const color_light = Colors.white;
+
+  static final color_selected = is_dark ? color_dark : color_light;
+  static final color_TheOther = is_dark ? color_light : color_dark;
   static const icon_main = "assets/Icon/main_transparent.svg";
   static const background = "assets/background_dark.png";
   static const font_style = GoogleFonts.outfit;
@@ -18,14 +29,10 @@ class sources {
 
   static const image_01 = "assets/Placeholder/Image1.png";
 
-  static var is_dark = true;
+  // static var is_dark = true;
   //static var is_dark = ThemeMode.system == ThemeMode.dark;
 
-  static const color_dark = Colors.black;
-  static const color_light = Colors.white;
-
-  static final color_selected = is_dark ? color_dark : color_light;
-  static final color_TheOther = is_dark ? color_light : color_dark;
+  // static final color_selected = is_dark ? color_dark : color_light;
 
   static const background_dark = "assets/background_dark.png";
   static const background_light = "assets/background_light.png";
@@ -123,8 +130,9 @@ class TheCard extends StatefulWidget {
   int? totalcomments;
   String senderUserImg = '';
   String targetUserImg = '';
-
+  String cherpDesc = '';
   String? targetUserName;
+  String? postImg;
   TheCard(
       this.senderUserName,
       this.cherpLikes,
@@ -134,6 +142,8 @@ class TheCard extends StatefulWidget {
       this.targetUserName,
       this.senderUserImg,
       this.targetUserImg,
+      this.cherpDesc,
+      this.postImg,
       // this.cherpLikeUserList,
       {Key? key})
       : super(key: key);
@@ -147,6 +157,8 @@ class _TheCardState extends State<TheCard> {
   bool? isLiked = false;
   bool isLoading = true;
   String senderImage = '';
+  String targetImage = '';
+
   // List cherpUserList = [];
   @override
   void initState() {
@@ -157,6 +169,8 @@ class _TheCardState extends State<TheCard> {
     user = FirebaseAuth.instance.currentUser;
     print("the card  ${widget.cherpLikeUserList.toString()}");
     senderImage = widget.senderUserImg.toString();
+    targetImage = widget.targetUserImg.toString();
+
     isLoading = false;
     // cherpUserList = widget.cherpLikeUserList!;
     // print("val $cherpUserList");
@@ -223,9 +237,7 @@ class _TheCardState extends State<TheCard> {
           Row(
             children: [
               getAvatar(
-                  path: widget.senderUserImg == null
-                      ? sources.avatar_02
-                      : widget.senderUserImg,
+                  path: senderImage.isEmpty ? sources.avatar_02 : senderImage,
                   name: widget.senderUserName.toString()),
               const Padding(
                 padding: EdgeInsets.all(8.0),
@@ -233,17 +245,16 @@ class _TheCardState extends State<TheCard> {
                     color: Colors.yellow),
               ), // Arrow
               getAvatar(
-                  path: widget.targetUserImg == null
-                      ? sources.avatar_02
-                      : widget.targetUserImg,
+                  path: targetImage.isEmpty ? sources.avatar_02 : targetImage,
                   name: widget.targetUserName.toString()),
             ],
           ), // Avatars
           Text(
-            "Here is the sample text, which is going to be replaced with the actual "
-            "tweet. This is just a placeholder for now. I am going to further design "
-            "the application.",
-            // widget.senderUserImg.toString(),
+            widget.cherpDesc.isEmpty
+                ? "Here is the sample text, which is going to be replaced with the actual "
+                    "tweet. This is just a placeholder for now. I am going to further design "
+                    "the application."
+                : widget.cherpDesc,
             style: sources.font_style(
               color: sources.color_TheOther.withOpacity(0.8),
               fontSize: 15,
@@ -259,8 +270,21 @@ class _TheCardState extends State<TheCard> {
             padding: const EdgeInsets.symmetric(vertical: 20),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Image.asset(sources.image_01,
-                  width: double.infinity, height: 200, fit: BoxFit.cover),
+              child: widget.postImg.toString().isEmpty
+                  ? Image.asset(sources.image_01,
+                      width: double.infinity, height: 200, fit: BoxFit.cover)
+                  : ClipRect(
+                      child: CachedNetworkImage(
+                        placeholder: (context, url) => Center(
+                          child: CupertinoActivityIndicator(
+                            color: Colors.amber,
+                          ),
+                        ),
+                        height: 200,
+                        width: double.infinity,
+                        imageUrl: widget.postImg.toString(),
+                      ),
+                    ),
             ),
           ), // Image
           Row(
