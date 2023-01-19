@@ -168,10 +168,12 @@ class _TheCardState extends State<TheCard> {
     // print(senderUserName);
     user = FirebaseAuth.instance.currentUser;
     print("the card  ${widget.cherpLikeUserList.toString()}");
+
     senderImage = widget.senderUserImg.toString();
+    isLoading = false;
+
     targetImage = widget.targetUserImg.toString();
 
-    isLoading = false;
     // cherpUserList = widget.cherpLikeUserList!;
     // print("val $cherpUserList");
 // user =FirebaseAuth.instance.currentUser;
@@ -183,6 +185,7 @@ class _TheCardState extends State<TheCard> {
     Widget getAvatar({
       required String path,
       required String name,
+      // required Widget errorBuilde,
     }) =>
         Expanded(
           child: Row(
@@ -217,7 +220,11 @@ class _TheCardState extends State<TheCard> {
           ),
         );
 
-    return Container(
+    return
+        // isLoading
+        //     ? Center(child: CupertinoActivityIndicator())
+        //     :
+        Container(
       decoration: BoxDecoration(
         color: sources.is_dark
             ? sources.color_dark.withOpacity(0.2)
@@ -237,6 +244,7 @@ class _TheCardState extends State<TheCard> {
           Row(
             children: [
               getAvatar(
+                  // errorBuilde:(BuildContext context, Object exception, StackTrace stackTrace),
                   path: senderImage.isEmpty ? sources.avatar_02 : senderImage,
                   name: widget.senderUserName.toString()),
               const Padding(

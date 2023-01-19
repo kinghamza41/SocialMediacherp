@@ -6,6 +6,7 @@ import 'package:cherp_app/Initial/Signin.dart';
 import 'package:cherp_app/Page/01_home.dart';
 import 'package:cherp_app/Page/05_settings.dart';
 import 'package:cherp_app/main.dart';
+import 'package:cherp_app/widget/flutter_toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,7 @@ class _OTP_verificationState extends State<OTP_verification> {
   String verfiyId = "";
   dynamic code = "";
   dynamic phone;
+  TextEditingController pinController = TextEditingController();
 
   // Future getUser() async {
   //   if (user != null) {
@@ -44,11 +46,12 @@ class _OTP_verificationState extends State<OTP_verification> {
     // ignore: todo
     // TODO: implement initState
     super.initState();
-    if (Get.arguments != null) {
-      phone = Get.arguments['phoneNumber'];
-      verfiyId = Get.arguments["id"];
-    }
-    print(phone);
+
+    phone = Get.arguments['phoneNumber'];
+    verfiyId = Get.arguments["id"];
+
+    print('phone is $phone');
+    print('verifyId is $verfiyId');
   }
 
   @override
@@ -134,7 +137,7 @@ class _OTP_verificationState extends State<OTP_verification> {
                 width: 250,
                 // margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
                 child: Pinput(
-                  // controller: pinController,
+                  controller: pinController,
                   //  focusNode: focusNode,
                   length: 6,
                   // androidSmsAutofillMethod:
@@ -152,15 +155,15 @@ class _OTP_verificationState extends State<OTP_verification> {
                   onCompleted: (pin) {
                     debugPrint('onCompleted: $pin');
                     setState(() {
-                      code = pin;
+                      pinController.text = pin;
                     });
                   },
                   onChanged: (value) {
                     debugPrint('onChanged: $value');
-                    print(value);
+                    // print(value);
                     // code = value;
                     // setState(() {
-                    //   code = value;
+                    //   pinController.text = value;
                     // });
                   },
                   cursor: Column(
@@ -196,53 +199,18 @@ class _OTP_verificationState extends State<OTP_verification> {
             SizedBox(
               height: screen_height / 70,
             ),
-            GestureDetector(
-              onTap: () async {
-                // showDialog(
-                //     context: context,
-                //     barrierDismissible: false,
-                //     builder: (BuildContext context) {
-                //       return ProgressDialog(
-                //         message: "Please Wait..",
-                //       );
-                //     });
-                await FirebaseAuth.instance.verifyPhoneNumber(
-                  phoneNumber: phone,
-                  verificationCompleted: (PhoneAuthCredential credential) {},
-                  verificationFailed: (FirebaseAuthException e) {},
-                  codeSent: (String verificationId, int? resendToken) {
-                    setState(() {
-                      verfiyId = verificationId;
-                      //  print("Verf id $id");
-                    });
-                    // Navigator.pop(context);
-
-                    // Get.off(() => OTP_verification(), arguments: {
-                    //   "id": id,
-                    //   'phoneNumber': phone,
-                    // });
-                  },
-                  codeAutoRetrievalTimeout: (String verId) {
-                    // Sign_in.verify = verId;
-                    // setState(() {
-                    //   authStatus = "TIMEOUT";
-                    // });
-                  },
-                );
-              },
-              child: Center(
-                child: Text.rich(TextSpan(
-                    text: "Didn't receive the code? ",
-                    style: TextStyle(color: Colors.grey, fontSize: 13),
-                    children: [
-                      TextSpan(
-                          text: "Resend",
-                          style: TextStyle(
-                              color: Color.fromARGB(255, 252, 231, 42),
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold))
-                    ])),
-              ),
+            Center(
+              child: Text.rich(TextSpan(
+                  text: "Didn't receive the code? ",
+                  style: TextStyle(color: Colors.grey, fontSize: 13),
+                  children: [
+                    TextSpan(
+                        text: "Resend",
+                        style: TextStyle(
+                            color: Color.fromARGB(255, 252, 231, 42),
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold))
+                  ])),
             ),
             SizedBox(
               height: screen_height * 0.15,
@@ -259,57 +227,74 @@ class _OTP_verificationState extends State<OTP_verification> {
                 child: TextButton(
                   onPressed: () async {
                     // print(Get.arguments["id"]);
-                    verfiyId = Get.arguments["id"];
-                    try {
-                      showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (BuildContext context) {
-                            return ProgressDialog(
-                              message: "Please Wait..",
-                            );
-                          });
-                      final AuthCredential credential =
-                          PhoneAuthProvider.credential(
-                        verificationId: Get.arguments["id"],
-                        smsCode: code.toString(),
-                      );
-                      User? userCredential =
-                          (await auth.signInWithCredential(credential)).user;
-                      final QuerySnapshot result = await FirebaseFirestore
-                          .instance
-                          .collection("users")
-                          .where('userId', isEqualTo: userCredential?.uid)
-                          .get();
-                      List<DocumentSnapshot> document = result.docs;
-                      if (document.length > 0) {
-                        Get.offAll(() => TheMain());
-                      } else {
-                        await firebaseFirestore
-                            .collection("users")
-                            .doc(userCredential!.uid)
-                            .set({
-                          'createdAt': DateTime.now(),
-                          'userName': "",
-                          'email': "",
-                          'phoneNumber': phone,
-                          'userImg': "",
-                          'fullName': "",
-                          'userProfileBio': "",
-                          "userId": userCredential.uid,
-                        }).then(
-                          (value) => Get.offAll(
-                            () => TheMain(),
-                          ),
+                    // if (code == null) {
+                    //   DisplayFlutterToast('Pin code is empty', context);
+                    // } else {
+                    //   print(code);
+                    // }
+                    if (pinController.text.toString().isEmpty &&
+                        pinController.text.length < 6) {
+                      DisplayFlutterToast('Pin code is empty', context);
+                    } else if (pinController.text.length == 6) {
+                      try {
+                        showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (BuildContext context) {
+                              return ProgressDialog(
+                                message: "Please Wait..",
+                              );
+                            });
+                        final AuthCredential credential =
+                            PhoneAuthProvider.credential(
+                          verificationId: verfiyId,
+                          smsCode: pinController.text.toString(),
                         );
+                        User? userCredential =
+                            (await auth.signInWithCredential(credential)).user;
+                        final QuerySnapshot result = await FirebaseFirestore
+                            .instance
+                            .collection("users")
+                            .where('userId', isEqualTo: userCredential?.uid)
+                            .get();
+                        List<DocumentSnapshot> document = result.docs;
+
+                        if (document.length > 0) {
+                          // showDialog(
+                          //     context: context,
+                          //     barrierDismissible: false,
+                          //     builder: (BuildContext context) {
+                          //       return ProgressDialog(
+                          //         message: "Please Wait..",
+                          //       );
+                          //     });
+                          Get.offAll(() => TheMain());
+                        } else {
+                          await firebaseFirestore
+                              .collection("users")
+                              .doc(userCredential!.uid)
+                              .set({
+                            'createdAt': DateTime.now(),
+                            'userName': "",
+                            'email': "",
+                            'phoneNumber': phone,
+                            'userImg': "",
+                            "userId": userCredential.uid,
+                          }).then(
+                            (value) => Get.offAll(
+                              () => TheMain(),
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        e.printError();
+                        DisplayFlutterToast('Invalid code', context);
+                        Navigator.pop(context);
                       }
-                    } catch (e) {
-                      e.printError();
-                      Navigator.pop(context);
                     }
                   },
                   child: Text(
-                    "Verify",
+                    "Send OTP",
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 15,

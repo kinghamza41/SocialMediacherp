@@ -72,8 +72,9 @@ class _MyAppState extends State<MyApp> {
 }
 
 class TheMain extends StatefulWidget {
-  const TheMain({Key? key}) : super(key: key);
+  TheMain({this.start_from = 0, super.key});
 
+  int start_from;
   static final my_controller = CarouselController();
   static const icon_names = [
     "globe",
@@ -145,6 +146,7 @@ class _TheMainState extends State<TheMain> {
         body: CarouselSlider(
           carouselController: TheMain.my_controller,
           options: CarouselOptions(
+            initialPage: widget.start_from,
             height: MediaQuery.of(context).size.height * 0.925,
             viewportFraction: 1,
             enableInfiniteScroll: false,

@@ -3,6 +3,7 @@
 // ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, camel_case_types, unused_local_variable, non_constant_identifier_names, unused_import, file_names, avoid_print, prefer_interpolation_to_compose_strings, unused_field
 
 import 'package:cherp_app/Initial/verification.dart';
+import 'package:cherp_app/widget/flutter_toast.dart';
 import 'package:cherp_app/widget/progress_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -128,39 +129,44 @@ class _Sign_inState extends State<Sign_in> {
                 ),
                 child: TextButton(
                   onPressed: () async {
-                    //  print(phone.toString());
-                    showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (BuildContext context) {
-                          return ProgressDialog(
-                            message: "Please Wait..",
-                          );
-                        });
-                    await FirebaseAuth.instance.verifyPhoneNumber(
-                      phoneNumber: phone,
-                      verificationCompleted:
-                          (PhoneAuthCredential credential) {},
-                      verificationFailed: (FirebaseAuthException e) {},
-                      codeSent: (String verificationId, int? resendToken) {
-                        setState(() {
-                          id = verificationId;
-                          print("Verf id $id");
-                        });
-                        Navigator.pop(context);
+                    print(phone.toString());
+                    if (phone == null) {
+                      DisplayFlutterToast("Mobile number is empty", context);
+                    } else {
+                      showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return ProgressDialog(
+                              message: "Please Wait..",
+                            );
+                          });
+                      await FirebaseAuth.instance.verifyPhoneNumber(
+                        timeout: Duration(seconds: 15),
+                        phoneNumber: phone,
+                        verificationCompleted:
+                            (PhoneAuthCredential credential) {},
+                        verificationFailed: (FirebaseAuthException e) {},
+                        codeSent: (String verificationId, int? resendToken) {
+                          setState(() {
+                            id = verificationId;
+                            print("Verf id $id");
+                          });
+                          Navigator.pop(context);
 
-                        Get.to(() => OTP_verification(), arguments: {
-                          "id": id,
-                          'phoneNumber': phone,
-                        });
-                      },
-                      codeAutoRetrievalTimeout: (String verId) {
-                        // Sign_in.verify = verId;
-                        // setState(() {
-                        //   authStatus = "TIMEOUT";
-                        // });
-                      },
-                    );
+                          Get.off(() => OTP_verification(), arguments: {
+                            "id": id,
+                            'phoneNumber': phone,
+                          });
+                        },
+                        codeAutoRetrievalTimeout: (String verId) {
+                          // Sign_in.verify = verId;
+                          // setState(() {
+                          //   authStatus = "TIMEOUT";
+                          // });
+                        },
+                      );
+                    }
                   },
                   child: Text(
                     "Send OTP",

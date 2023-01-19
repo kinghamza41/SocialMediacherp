@@ -283,7 +283,7 @@ class _SearchTweetsState extends State<SearchTweets> {
                       List cherpLikeUserList =
                           snapshot.data!.docs[index]['cherpLikeUserList'];
                       print(cherpLikeUserList.toString());
-                      return TheCard(
+                      return  TheCard(
                         senderUserName,
                         cherpLikes!,
                         documentId,

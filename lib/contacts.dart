@@ -1,9 +1,7 @@
-// ignore_for_file: use_build_context_synchronously, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, prefer_const_constructors, library_private_types_in_public_api, avoid_print, unnecessary_null_comparison, prefer_typing_uninitialized_variables, non_constant_identifier_names, prefer_interpolation_to_compose_strings, unnecessary_string_interpolations
+// ignore_for_file: use_build_context_synchronously, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, prefer_const_constructors, library_private_types_in_public_api, avoid_print, unnecessary_null_comparison, prefer_typing_uninitialized_variables, non_constant_identifier_names, prefer_interpolation_to_compose_strings, unnecessary_string_interpolations, unnecessary_brace_in_string_interps, unused_local_variable, sized_box_for_whitespace, duplicate_ignore
 
-import 'dart:developer';
 import 'dart:io';
 
-import 'package:cherp_app/Page/send_cherp_screen.dart';
 import 'package:cherp_app/main.dart';
 import 'package:cherp_app/sources.dart';
 import 'package:cherp_app/widget/flutter_toast.dart';
@@ -78,6 +76,23 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
     }
   }
 
+   Future<void> getTotalUsers() async {
+    if (user != null) {
+      //  await FirebaseFirestore.instance.collection("users").get();
+      final snapshot = await FirebaseFirestore.instance
+          .collection("users")
+         
+          .get();
+   
+      List totalNumbers = snapshot.docs.first['phoneNumber'];
+    
+
+      setState(() {
+        print(senderUserId);
+      });
+    }
+  }
+
   Future<void> getTargetUserDetails(String targetUserPhoneNumber) async {
     try {
       final snapshot = await FirebaseFirestore.instance
@@ -144,7 +159,7 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                   await FlutterContacts.getContact(_contacts![i].id);
               // String v = fullContact!.phones.first.number;
 
-              await Get.offAll(() => ContactPage(fullContact!), arguments: {
+              await Get.offAll(() => ContactPage(fullContact), arguments: {
                 'senderUserId': senderUserId,
                 'senderUserName': senderUserName,
                 'senderUserImg': senderUserImg,
@@ -162,7 +177,7 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
 }
 
 class ContactPage extends StatefulWidget {
-  final Contact contact;
+  final Contact? contact;
   ContactPage(this.contact);
 
   @override
@@ -179,7 +194,8 @@ class _ContactPageState extends State<ContactPage> {
   String? senderUserNumber;
   String? senderUserImg;
   File? selectedImage;
-
+  String replaced = '';
+  String finalSelectedNumber = '';
   User? user = FirebaseAuth.instance.currentUser;
   TextEditingController cherpDescController = TextEditingController();
 
@@ -253,6 +269,21 @@ class _ContactPageState extends State<ContactPage> {
     senderUserNumber = Get.arguments['senderUserNumber'];
 
     senderUserImg = Get.arguments['senderUserImg'];
+
+    // final phoneRegex = RegExp(r'(0|\+?92)3\d{9,11}$');
+
+    if (widget.contact!.phones.first.number.startsWith('0')) {
+      // if start with '0' then replace it with '+92'
+      replaced = widget.contact!.phones.first.number.replaceFirst('0', '+92');
+      finalSelectedNumber = replaced.replaceAll(' ', '');
+
+      print('replaced: $replaced');
+      print(finalSelectedNumber);
+    } else {
+      // print('invalid phone');
+      finalSelectedNumber =
+          widget.contact!.phones.first.number.replaceAll(' ', '');
+    }
   }
 
   @override
@@ -268,254 +299,260 @@ class _ContactPageState extends State<ContactPage> {
           ),
         );
 
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/background_dark.png'
-                // sources.is_dark
-                //     ? profile
-                //         ? sources.background_profile_dark
-                //         : sources.background_dark
-                //     : profile
-                //         ? sources.background_profile_light
-                //         : sources.background_light,
-                ),
-            fit: BoxFit.cover,
+    return WillPopScope(
+      onWillPop: () async {
+        Get.offAll(TheMain(
+          start_from: 2,
+        ));
+        return false;
+      },
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/background_dark.png'
+                  // sources.is_dark
+                  //     ? profile
+                  //         ? sources.background_profile_dark
+                  //         : sources.background_dark
+                  //     : profile
+                  //         ? sources.background_profile_light
+                  //         : sources.background_light,
+                  ),
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
-        child: Column(
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.03,
-            ), // 3% Empty screen height
-            Container(
-              alignment: Alignment.centerRight,
-              child: OutlinedButton(
-                onPressed: () async {
-                  // sending cherp to contact
-                  await getTargetUserDetails(
-                      widget.contact.phones.first.number);
-                  print(targetUserNumber);
-                  print(senderUserId);
-                  if (cherpDescController.text.isNotEmpty &&
-                      selectedImage != null) {
-                    if (widget.contact.phones.first.number ==
-                        targetUserNumber) {
-                      String? postId = Uuid().v4();
-                      int totalComments = 0;
-                      String? imageurl;
-                      showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (BuildContext context) {
-                            return ProgressDialog(
-                              message: "Please Wait..",
-                            );
-                          });
-                      try {
-                        CollectionReference users =
-                            FirebaseFirestore.instance.collection('users');
-                        // User? user = FirebaseAuth.instance.currentUser;
-                        final ref = FirebaseStorage.instance
-                            .ref()
-                            .child("userPostImages")
-                            .child(DateTime.now().toString() + ".jpg");
+          child: Column(
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.03,
+              ), // 3% Empty screen height
+              Container(
+                alignment: Alignment.centerRight,
+                child: OutlinedButton(
+                  onPressed: () async {
+                    // sending cherp to contact
+                    await getTargetUserDetails(finalSelectedNumber);
+                    print(targetUserNumber);
+                    print(senderUserId);
+                    if (cherpDescController.text.isNotEmpty &&
+                        selectedImage != null) {
+                      if (finalSelectedNumber == targetUserNumber) {
+                        String? postId = Uuid().v4();
+                        int totalComments = 0;
+                        String? imageurl;
+                        showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (BuildContext context) {
+                              return ProgressDialog(
+                                message: "Please Wait..",
+                              );
+                            });
+                        try {
+                          CollectionReference users =
+                              FirebaseFirestore.instance.collection('users');
+                          // User? user = FirebaseAuth.instance.currentUser;
+                          final ref = FirebaseStorage.instance
+                              .ref()
+                              .child("userPostImages")
+                              .child(DateTime.now().toString() + ".jpg");
 
-                        await ref.putFile(selectedImage!);
-                        imageurl = await ref.getDownloadURL();
-                        await FirebaseFirestore.instance
-                            .collection("your_cherps")
-                            .doc(postId)
-                            .set(
-                          {
-                            'senderUserId': senderUserId,
-                            'createdAt': DateTime.now(),
-                            'senderUserName': senderUserName,
-                            'senderUserNumber': senderUserNumber,
-                            'senderUserImg': senderUserImg,
-                            'postImg': imageurl,
-                            'targetUserName': targetUserName,
-                            'targetUserId': targetUserId,
-                            'targetUserImg': targetUserImg,
-                            'cherpTotalComment': totalComments,
-                            'cherpLikeUserList': [],
-                            'postId': postId,
-                            'cherpLikes': 0,
-                            'cherpDesc': cherpDescController.text,
-                            'targetUserNumber':
-                                widget.contact.phones.first.number,
-                          },
-                        ).then((value) => DisplayFlutterToast(
-                                'Post has been uploaded', context));
-                        Navigator.pop(context);
-                        Get.off(() => TheMain());
-                      } catch (e) {
-                        print(e);
+                          await ref.putFile(selectedImage!);
+                          imageurl = await ref.getDownloadURL();
+                          await FirebaseFirestore.instance
+                              .collection("your_cherps")
+                              .doc(postId)
+                              .set(
+                            {
+                              'senderUserId': senderUserId,
+                              'createdAt': DateTime.now(),
+                              'senderUserName': senderUserName,
+                              'senderUserNumber': senderUserNumber,
+                              'senderUserImg': senderUserImg,
+                              'postImg': imageurl,
+                              'targetUserName': targetUserName,
+                              'targetUserId': targetUserId,
+                              'targetUserImg': targetUserImg,
+                              'cherpTotalComment': totalComments,
+                              'cherpLikeUserList': [],
+                              'postId': postId,
+                              'cherpLikes': 0,
+                              'cherpDesc': cherpDescController.text,
+                              'targetUserNumber': finalSelectedNumber,
+                            },
+                          ).then((value) => DisplayFlutterToast(
+                                  'Post has been uploaded', context));
+                          Navigator.pop(context);
+                          Get.off(() => TheMain());
+                        } catch (e) {
+                          print(e);
+                        }
                       }
+                    } else if (selectedImage == null) {
+                      DisplayFlutterToast("Please select image", context);
+                    } else if (cherpDescController.text.isEmpty) {
+                      DisplayFlutterToast("Write Description", context);
                     }
-                  } else if (selectedImage == null) {
-                    DisplayFlutterToast("Please select image", context);
-                  } else if (cherpDescController.text.isEmpty) {
-                    DisplayFlutterToast("Write Description", context);
-                  }
-                },
-                style: OutlinedButton.styleFrom(
-                  backgroundColor: Colors.yellow.withOpacity(0.05),
-                  foregroundColor: Colors.yellow,
-                  side: const BorderSide(
-                    color: Colors.yellow,
-                    width: 2,
+                  },
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: Colors.yellow.withOpacity(0.05),
+                    foregroundColor: Colors.yellow,
+                    side: const BorderSide(
+                      color: Colors.yellow,
+                      width: 2,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(
-                          MediaQuery.of(context).size.width * 0.02),
-                      child: Text(
-                        "Cherp",
-                        style: sources.font_style(
-                          color: Colors.yellow,
-                          fontSize: MediaQuery.of(context).size.width * 0.045,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(
+                            MediaQuery.of(context).size.width * 0.02),
+                        child: Text(
+                          "Cherp",
+                          style: sources.font_style(
+                            color: Colors.yellow,
+                            fontSize: MediaQuery.of(context).size.width * 0.045,
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(
-                          MediaQuery.of(context).size.width * 0.02),
-                      child: SvgPicture.asset(
-                        sources.icon_main,
-                        height: MediaQuery.of(context).size.height * 0.025,
-                        color: Colors.yellow,
+                      Padding(
+                        padding: EdgeInsets.all(
+                            MediaQuery.of(context).size.width * 0.02),
+                        child: SvgPicture.asset(
+                          sources.icon_main,
+                          height: MediaQuery.of(context).size.height * 0.025,
+                          color: Colors.yellow,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ), // Cherp button
-            Expanded(
-              child: Container(
-                margin: EdgeInsets.symmetric(
-                  vertical: MediaQuery.of(context).size.height * 0.04,
-                ),
-                alignment: Alignment.topLeft,
-                child: TextField(
-                  cursorColor: accent_color,
-                  controller: cherpDescController,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: MediaQuery.of(context).size.height * 0.01,
-                      horizontal: MediaQuery.of(context).size.width * 0.04,
-                    ),
-                    icon: const MyAvatar(aspect: 0.1),
-                    hintText: "What's Happening?",
-                    hintStyle: sources.font_style(
-                      color: sources.color_TheOther.withOpacity(0.5),
-                    ),
-                    border: InputBorder.none,
-                  ),
-                  style: sources.font_style(
-                    color: sources.color_TheOther,
-                    fontSize: MediaQuery.of(context).size.width * 0.045,
+                    ],
                   ),
                 ),
-              ),
-            ), // What's Happening
-            selectedImage != null
-                ? Container(
-                    height: 200,
-                    child: Image.file(
-                      selectedImage!,
-                      fit: BoxFit.contain,
-                      // height: 00,
-                      // width: double.infinity,
+              ), // Cherp button
+              Expanded(
+                child: Container(
+                  margin: EdgeInsets.symmetric(
+                    vertical: MediaQuery.of(context).size.height * 0.04,
+                  ),
+                  alignment: Alignment.topLeft,
+                  child: TextField(
+                    cursorColor: accent_color,
+                    controller: cherpDescController,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: MediaQuery.of(context).size.height * 0.01,
+                        horizontal: MediaQuery.of(context).size.width * 0.04,
+                      ),
+                      icon: const MyAvatar(aspect: 0.1),
+                      hintText: "What's happening",
+                      hintStyle: sources.font_style(
+                        color: sources.color_TheOther.withOpacity(0.5),
+                      ),
+                      border: InputBorder.none,
                     ),
-                  )
-                : Spacer(),
-            Row(
-              children: [
-                bottomLogo(sources.icon_phone),
-                Expanded(
-                  flex: 3,
-                  child: Text(
-                    // widget.contact.phones.first.number?
-
-                    // Get.arguments['fullContact']?
-                    '${widget.contact.phones.isNotEmpty ? widget.contact.phones.first.number : '(none)'}',
-
-                    // : Get.arguments['fullContact'],
-                    textAlign: TextAlign.left,
                     style: sources.font_style(
-                      color: sources.color_TheOther.withOpacity(0.5),
+                      color: sources.color_TheOther,
                       fontSize: MediaQuery.of(context).size.width * 0.045,
                     ),
                   ),
                 ),
-                GestureDetector(
-                  onTap: () async {
-                    PermissionStatus galleryPermission =
-                        await Permission.storage.request();
-                    print(galleryPermission);
+              ), // What's Happening
+              selectedImage != null
+                  ? Container(
+                      height: 200,
+                      child: Image.file(
+                        selectedImage!,
+                        fit: BoxFit.contain,
+                        // height: 00,
+                        // width: double.infinity,
+                      ),
+                    )
+                  : Spacer(),
+              Row(
+                children: [
+                  bottomLogo(sources.icon_phone),
+                  Expanded(
+                    flex: 3,
+                    child: Text(
+                      // widget.contact.phones.first.number?
 
-                    if (galleryPermission == PermissionStatus.granted) {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text("Pick Image:"),
-                            actions: [
-                              ListTile(
-                                leading: const Icon(Icons.camera),
-                                title: const Text('Camera'),
-                                onTap: () {
-                                  // chooseImage("camera");
-                                  Navigator.pop(context);
+                      // Get.arguments['fullContact']?
+                      '${finalSelectedNumber.isNotEmpty ? finalSelectedNumber : '(none)'}',
 
-                                  // selectImages("camera");
-                                  chooseImage("Camera", context);
-                                },
-                              ),
-                              ListTile(
-                                leading: const Icon(Icons.photo),
-                                title: const Text('Gallery'),
-                                onTap: () {
-                                  Navigator.pop(context);
+                      // : Get.arguments['fullContact'],
+                      textAlign: TextAlign.left,
+                      style: sources.font_style(
+                        color: sources.color_TheOther.withOpacity(0.5),
+                        fontSize: MediaQuery.of(context).size.width * 0.045,
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      PermissionStatus galleryPermission =
+                          await Permission.storage.request();
+                      print(galleryPermission);
 
-                                  chooseImage("Gallery", context);
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    }
-                    if (galleryPermission == PermissionStatus.denied) {
-                      DisplayFlutterToast("Please Allow Permission", context);
-                    }
-                    if (galleryPermission ==
-                        PermissionStatus.permanentlyDenied) {
-                      DisplayFlutterToast(
-                          "Please Allow Permission For Further Usage", context);
-                      openAppSettings();
-                    }
-                  },
-                  child: bottomLogo(sources.icon_photo),
-                  // child: SvgPicture.asset(
-                  //   sources.icon_photo,
-                  //   height: MediaQuery.of(context).size.height * 0.025,
-                  //   color: accent_color,
-                  // ),
-                ),
-                bottomLogo(sources.icon_video),
-                bottomLogo(sources.icon_audio),
-              ],
-            ), // Select Contact, Photo, Video, Audio
-          ],
+                      if (galleryPermission == PermissionStatus.granted) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text("Pick Image:"),
+                              actions: [
+                                ListTile(
+                                  leading: const Icon(Icons.camera),
+                                  title: const Text('Camera'),
+                                  onTap: () {
+                                    // chooseImage("camera");
+                                    Navigator.pop(context);
+
+                                    // selectImages("camera");
+                                    chooseImage("Camera", context);
+                                  },
+                                ),
+                                ListTile(
+                                  leading: const Icon(Icons.photo),
+                                  title: const Text('Gallery'),
+                                  onTap: () {
+                                    Navigator.pop(context);
+
+                                    chooseImage("Gallery", context);
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                      if (galleryPermission == PermissionStatus.denied) {
+                        DisplayFlutterToast("Please Allow Permission", context);
+                      }
+                      if (galleryPermission ==
+                          PermissionStatus.permanentlyDenied) {
+                        DisplayFlutterToast(
+                            "Please Allow Permission For Further Usage",
+                            context);
+                        openAppSettings();
+                      }
+                    },
+                    child: bottomLogo(sources.icon_photo),
+                    // child: SvgPicture.asset(
+                    //   sources.icon_photo,
+                    //   height: MediaQuery.of(context).size.height * 0.025,
+                    //   color: accent_color,
+                    // ),
+                  ),
+                  bottomLogo(sources.icon_video),
+                  bottomLogo(sources.icon_audio),
+                ],
+              ), // Select Contact, Photo, Video, Audio
+            ],
+          ),
         ),
       ),
     );
@@ -561,6 +598,7 @@ class _ContactPageState extends State<ContactPage> {
     //           'cherpDesc': "",
     //           'targetUserNumber': widget.contact.phones.first.number,
     //           // ignore: todo
+    // ignore: todo
     //           // TODO IMP
     //           // 'cherpComments': [
     //           //   {
