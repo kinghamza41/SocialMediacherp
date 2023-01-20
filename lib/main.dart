@@ -1,7 +1,8 @@
-// ignore_for_file: prefer_const_constructors, non_constant_identifier_names, must_be_immutable, unused_import, await_only_futures, prefer_const_constructors_in_immutables, avoid_print
+// ignore_for_file: prefer_const_constructors, non_constant_identifier_names, must_be_immutable, unused_import, await_only_futures, prefer_const_constructors_in_immutables, avoid_print, constant_identifier_names
 
 import 'dart:async';
 
+import 'package:cherp_app/Initial/splash_screen.dart';
 import 'package:cherp_app/contacts.dart';
 import 'package:cherp_app/firebase_options.dart';
 import 'package:cherp_app/sources.dart';
@@ -59,7 +60,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: "Twittery",
       // user != null ? TheMain() : Sign_in()
-      home: user != null ? TheMain() : Sign_in(),
+      home: SplashScreen(),
       //initialRoute: 'signin',
       // routes: {
       //   "signin": (context) => Sign_in(),

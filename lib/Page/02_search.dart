@@ -1,12 +1,10 @@
-// ignore_for_file: file_names, prefer_const_constructors, unnecessary_null_comparison, avoid_print, avoid_unnecessary_containers, duplicate_ignore, unrelated_type_equality_checks, prefer_const_literals_to_create_immutables, prefer_typing_uninitialized_variables, unused_local_variable
+// ignore_for_file: file_names, prefer_const_constructors, unnecessary_null_comparison, avoid_print, avoid_unnecessary_containers, duplicate_ignore, unrelated_type_equality_checks, prefer_const_literals_to_create_immutables, prefer_typing_uninitialized_variables, unused_local_variable, unnecessary_import
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:numeral/numeral.dart';
-import 'package:sizer/sizer.dart';
-import 'src/sources.dart';
+
 import '../sources.dart';
+import 'src/sources.dart';
 
 class MySearch extends StatefulWidget {
   const MySearch({Key? key}) : super(key: key);

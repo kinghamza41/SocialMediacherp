@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names, must_be_immutable, prefer_const_constructors_in_immutables
+// ignore_for_file: non_constant_identifier_names, must_be_immutable, prefer_const_constructors_in_immutables, avoid_print
 
 import 'package:cherp_app/contacts.dart';
 import 'package:cherp_app/widget/flutter_toast.dart';
